@@ -7,16 +7,21 @@ final class ClosetRepository: ObservableObject {
     @Published private(set) var userProfile: UserProfile
 
     private let store: ClosetLocalStoring
+    private let seedSnapshot: ClosetRepositorySnapshot
 
-    init(store: ClosetLocalStoring = UserDefaultsClosetStore()) {
+    init(
+        store: ClosetLocalStoring = UserDefaultsClosetStore(),
+        seedSnapshot: ClosetRepositorySnapshot = SeedDataProvider.load()
+    ) {
         self.store = store
+        self.seedSnapshot = seedSnapshot
 
         if let snapshot = store.load() {
             closetItems = snapshot.closetItems
             userProfile = snapshot.userProfile
         } else {
-            closetItems = SampleData.closet
-            userProfile = SampleData.profile
+            closetItems = seedSnapshot.closetItems
+            userProfile = seedSnapshot.userProfile
             persist()
         }
     }
@@ -53,8 +58,8 @@ final class ClosetRepository: ObservableObject {
     }
 
     func resetToSeedData() {
-        closetItems = SampleData.closet
-        userProfile = SampleData.profile
+        closetItems = seedSnapshot.closetItems
+        userProfile = seedSnapshot.userProfile
         persist()
     }
 

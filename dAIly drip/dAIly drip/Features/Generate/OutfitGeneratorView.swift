@@ -103,6 +103,8 @@ struct OutfitGeneratorView: View {
                         title: outfit.title,
                         heroSymbol: heroSymbol(for: outfit),
                         detailSymbols: detailSymbols(for: outfit),
+                        heroImageName: heroItem(for: outfit)?.imagePath,
+                        detailImageNames: detailItems(for: outfit).compactMap(\.imagePath),
                         heroOnLeft: index.isMultiple(of: 2)
                     )
                 }
@@ -115,17 +117,25 @@ struct OutfitGeneratorView: View {
     }
 
     private func heroSymbol(for outfit: Outfit) -> String {
-        guard let item = closetRepository.closetItems.first(where: { outfit.itemIds.contains($0.id) }) else {
+        guard let item = heroItem(for: outfit) else {
             return "tshirt"
         }
         return item.placeholderSymbol
     }
 
     private func detailSymbols(for outfit: Outfit) -> [String] {
+        detailItems(for: outfit).map { $0.placeholderSymbol }
+    }
+
+    private func heroItem(for outfit: Outfit) -> ClosetItem? {
+        closetRepository.closetItems.first { outfit.itemIds.contains($0.id) }
+    }
+
+    private func detailItems(for outfit: Outfit) -> [ClosetItem] {
         let items = outfit.itemIds.compactMap { id in
             closetRepository.closetItems.first(where: { $0.id == id })
         }
-        return Array(items.dropFirst().prefix(2)).map { $0.placeholderSymbol }
+        return Array(items.dropFirst().prefix(2))
     }
 }
 

@@ -4,6 +4,7 @@ import SwiftUI
 struct ItemCard: View {
     let name: String
     let tags: [String]
+    let imageName: String?
     /// SF Symbol used as the placeholder while there's no real image asset yet.
     let placeholderSymbol: String
     /// Tint behind the placeholder symbol. Pulled from the AppColor palette per call site.
@@ -14,9 +15,15 @@ struct ItemCard: View {
             ZStack {
                 Rectangle()
                     .fill(AppColor.surfaceContainer)
-                Image(systemName: placeholderSymbol)
-                    .font(.system(size: 56, weight: .ultraLight))
-                    .foregroundStyle(placeholderTint)
+                if let imageName {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(systemName: placeholderSymbol)
+                        .font(.system(size: 56, weight: .ultraLight))
+                        .foregroundStyle(placeholderTint)
+                }
             }
             .aspectRatio(3.0/4.0, contentMode: .fill)
             .clipped()
@@ -42,9 +49,9 @@ struct ItemCard: View {
 
 #Preview {
     LazyVGrid(columns: [GridItem(.flexible(), spacing: Spacing.gutter), GridItem(.flexible())]) {
-        ItemCard(name: "Silk Overshirt", tags: ["Silk", "White"],
+        ItemCard(name: "Silk Overshirt", tags: ["Silk", "White"], imageName: nil,
                  placeholderSymbol: "tshirt", placeholderTint: AppColor.outlineVariant)
-        ItemCard(name: "Cashmere Knit", tags: ["Winter", "Navy"],
+        ItemCard(name: "Cashmere Knit", tags: ["Winter", "Navy"], imageName: nil,
                  placeholderSymbol: "tshirt.fill", placeholderTint: AppColor.outline)
     }
     .padding()

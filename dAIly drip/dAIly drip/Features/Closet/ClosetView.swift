@@ -97,6 +97,7 @@ struct ClosetView: View {
                     ItemCard(
                         name: item.name,
                         tags: tags(for: item),
+                        imageName: item.imagePath,
                         placeholderSymbol: item.placeholderSymbol,
                         placeholderTint: AppColor.outline
                     )
