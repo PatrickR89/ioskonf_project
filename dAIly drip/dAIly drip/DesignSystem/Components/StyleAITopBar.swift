@@ -11,18 +11,18 @@ struct StyleAITopBar: View {
 
     var body: some View {
         HStack {
-            leadingButton
-                .frame(width: 32, height: 32, alignment: .leading)
+//            leadingButton
+//                .frame(width: 32, height: 32, alignment: .leading)
             Spacer()
             StyleAIWordmark()
             Spacer()
-            Button(action: trailingAction) {
-                Label("Account", systemImage: "person.crop.circle")
-                    .labelStyle(.iconOnly)
-                    .font(.system(size: 24, weight: .regular))
-                    .foregroundStyle(trailingTinted ? AppColor.primary : AppColor.outline)
-            }
-            .frame(width: 32, height: 32, alignment: .trailing)
+//            Button(action: trailingAction) {
+//                Label("Account", systemImage: "person.crop.circle")
+//                    .labelStyle(.iconOnly)
+//                    .font(.system(size: 24, weight: .regular))
+//                    .foregroundStyle(trailingTinted ? AppColor.primary : AppColor.outline)
+//            }
+//            .frame(width: 32, height: 32, alignment: .trailing)
         }
         .padding(.horizontal, Spacing.containerMargin)
         .frame(height: 56)
