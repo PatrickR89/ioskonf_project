@@ -4,8 +4,10 @@ struct OutfitGeneratorView: View {
     @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var prompt: String = ""
     @State private var selectedQuickPrompt: String? = "Chic Dinner Date"
+    @State private var isGenerating = false
+    @State private var generationError: String?
 
-    private let outfits = SampleData.outfits
+    private let outfitGenerationService = OutfitGenerationService()
     private let quickPrompts = SampleData.occasionPrompts
 
     var body: some View {
@@ -23,6 +25,11 @@ struct OutfitGeneratorView: View {
             }
         }
         .background(AppColor.background)
+        .alert("Outfit Generation Failed", isPresented: generationErrorBinding) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(generationError ?? "Try again with a different occasion.")
+        }
     }
 
     private var header: some View {
@@ -72,10 +79,21 @@ struct OutfitGeneratorView: View {
                         SelectableChip(text: item, isSelected: selectedQuickPrompt == item) {
                             selectedQuickPrompt = item
                             prompt = item
+                            generate()
                         }
                     }
                 }
             }
+
+            PrimaryButton(
+                title: isGenerating ? "Generating Outfits" : "Generate Outfits",
+                trailingSystemImage: isGenerating ? nil : "sparkles",
+                leadingSystemImage: isGenerating ? "sparkles" : nil
+            ) {
+                generate()
+            }
+            .disabled(isGenerating || resolvedPrompt.isEmpty)
+            .opacity(isGenerating ? 0.75 : 1)
         }
     }
 
@@ -86,18 +104,13 @@ struct OutfitGeneratorView: View {
                     .appFont(.headlineMd)
                     .foregroundStyle(AppColor.onSurface)
                 Spacer()
-                Button {
-                    // future: open all generated outfits
-                } label: {
-                    Text("View All")
-                        .appFont(.labelMd)
-                        .foregroundStyle(AppColor.primary)
+                if isGenerating {
+                    ProgressView()
                 }
-                .buttonStyle(.plain)
             }
 
             VStack(spacing: Spacing.stackLg) {
-                ForEach(Array(outfits.enumerated()), id: \.element.id) { index, outfit in
+                ForEach(Array(closetRepository.generatedOutfits.enumerated()), id: \.element.id) { index, outfit in
                     BentoOutfitCard(
                         optionLabel: outfit.optionLabel,
                         title: outfit.title,
@@ -112,8 +125,47 @@ struct OutfitGeneratorView: View {
         }
     }
 
+    private var generationErrorBinding: Binding<Bool> {
+        Binding {
+            generationError != nil
+        } set: { isPresented in
+            if !isPresented {
+                generationError = nil
+            }
+        }
+    }
+
+    private var resolvedPrompt: String {
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedPrompt.isEmpty {
+            return trimmedPrompt
+        }
+        return selectedQuickPrompt ?? ""
+    }
+
     private func generate() {
-        // Placeholder — wired up later when the AI service exists.
+        let request = resolvedPrompt
+        guard !request.isEmpty, !isGenerating else {
+            return
+        }
+
+        isGenerating = true
+        generationError = nil
+        closetRepository.clearGeneratedOutfits()
+
+        Task {
+            do {
+                let outfits = try await outfitGenerationService.generateOutfits(
+                    prompt: request,
+                    userProfile: closetRepository.userProfile,
+                    closetItems: closetRepository.closetItems
+                )
+                closetRepository.updateGeneratedOutfits(outfits)
+            } catch {
+                generationError = error.localizedDescription
+            }
+            isGenerating = false
+        }
     }
 
     private func heroSymbol(for outfit: Outfit) -> String {
