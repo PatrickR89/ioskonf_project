@@ -78,11 +78,15 @@ final class ScanReviewViewModel {
     /// Builds a `ClosetItem` from the current draft attributes. `ownerId` and
     /// `imagePath` are supplied by the caller because they live outside this
     /// view model's responsibility (auth + storage layers).
-    func makeClosetItem(ownerId: String, imagePath: String? = nil) -> ClosetItem {
+    func makeClosetItem(
+        id: String = UUID().uuidString,
+        ownerId: String,
+        imagePath: String? = nil
+    ) -> ClosetItem {
         let suggestedName = "\(draftColor.name) \(draftType.displayName)"
             .trimmingCharacters(in: .whitespaces)
         return ClosetItem(
-            id: UUID().uuidString,
+            id: id,
             ownerId: ownerId,
             name: suggestedName,
             type: draftType,
@@ -93,6 +97,53 @@ final class ScanReviewViewModel {
             imagePath: imagePath,
             createdAt: .now
         )
+    }
+
+    /// Persists the current `selectedImage` (if any) to local disk and returns a
+    /// fully-formed `ClosetItem` ready to hand to `ClosetRepository.addClosetItem`.
+    /// Caller is responsible for the actual `addClosetItem` call so the repo
+    /// stays out of the view model.
+    func buildItemForSave(ownerId: String) -> ClosetItem {
+        let id = UUID().uuidString
+        var imagePath: String?
+
+        if let image = selectedImage {
+            let resized = image.downscaled(maxEdge: 1600)
+            if let jpeg = resized.jpegData(compressionQuality: 0.85) {
+                do {
+                    imagePath = try LocalImageStore.write(jpeg: jpeg, for: id)
+                } catch {
+                    BackendLogger.error(
+                        "Failed to write closet image to local disk",
+                        error: error,
+                        metadata: ["id": id, "jpegBytes": jpeg.count]
+                    )
+                }
+            } else {
+                BackendLogger.warning(
+                    "Could not encode closet image as JPEG",
+                    metadata: ["id": id]
+                )
+            }
+        }
+
+        return makeClosetItem(id: id, ownerId: ownerId, imagePath: imagePath)
+    }
+
+    /// Clears the form so the user can scan another item. Called after a
+    /// successful save.
+    func resetAfterSave() {
+        analyzeTask?.cancel()
+        loadTask?.cancel()
+        selectedImage = nil
+        photoPickerItem = nil
+        loadError = nil
+        analyzeError = nil
+        isAnalyzingImage = false
+        draftType = SampleData.scanCandidate.type
+        draftSeasons = SampleData.scanCandidate.seasons
+        draftOccasions = SampleData.scanCandidate.occasions
+        draftColor = SampleData.scanCandidate.primaryColor
     }
 
     func handlePickerSelection(_ item: PhotosPickerItem?) {

@@ -15,15 +15,7 @@ struct ItemCard: View {
             ZStack {
                 Rectangle()
                     .fill(AppColor.surfaceContainer)
-                if let imageName {
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                } else {
-                    Image(systemName: placeholderSymbol)
-                        .font(.system(size: 56, weight: .ultraLight))
-                        .foregroundStyle(placeholderTint)
-                }
+                imageContent
             }
             .aspectRatio(3.0/4.0, contentMode: .fit)
             .clipped()
@@ -44,6 +36,28 @@ struct ItemCard: View {
         .background(AppColor.surfaceContainerLowest)
         .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
         .ambientShadow(blur: 30, y: 10, opacity: 0.04)
+    }
+
+    @ViewBuilder
+    private var imageContent: some View {
+        if let imageName, !imageName.isEmpty {
+            if LocalImageStore.isManagedPath(imageName),
+               let uiImage = LocalImageStore.loadImage(forRelativePath: imageName) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        } else {
+            Image(systemName: placeholderSymbol)
+                .font(.system(size: 56, weight: .ultraLight))
+                .foregroundStyle(placeholderTint)
+        }
     }
 }
 
