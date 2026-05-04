@@ -4,7 +4,6 @@ import SwiftUI
 struct ScanReviewView: View {
     @State private var viewModel = ScanReviewViewModel()
 
-    private let item = SampleData.scanCandidate
     private let suggestions = ["White Turtleneck", "Dark Wash Denim"]
 
     var body: some View {
@@ -48,6 +47,14 @@ struct ScanReviewView: View {
         }
         .onChange(of: viewModel.photoPickerItem) { _, newItem in
             viewModel.handlePickerSelection(newItem)
+        }
+        .sheet(item: $viewModel.editingField) { field in
+            switch field {
+            case .type:      TypeEditorView(viewModel: viewModel)
+            case .seasons:   SeasonsEditorView(viewModel: viewModel)
+            case .occasions: OccasionsEditorView(viewModel: viewModel)
+            case .color:     ColorEditorView(viewModel: viewModel)
+            }
         }
     }
 
@@ -111,13 +118,26 @@ struct ScanReviewView: View {
                 ],
                 spacing: Spacing.gutter
             ) {
-                AttributeCard(label: "Type", values: [item.type.displayName])
-                AttributeCard(label: "Season", values: item.seasons.map(\.displayName).sorted())
-                AttributeCard(label: "Occasion", values: item.occasions.map(\.displayName).sorted())
+                AttributeCard(
+                    label: "Type",
+                    values: [viewModel.draftType.displayName],
+                    onEdit: { viewModel.beginEdit(.type) }
+                )
+                AttributeCard(
+                    label: "Season",
+                    values: viewModel.draftSeasons.map(\.displayName).sorted(),
+                    onEdit: { viewModel.beginEdit(.seasons) }
+                )
+                AttributeCard(
+                    label: "Occasion",
+                    values: viewModel.draftOccasions.map(\.displayName).sorted(),
+                    onEdit: { viewModel.beginEdit(.occasions) }
+                )
                 AttributeCard(
                     label: "Color",
-                    values: [item.primaryColor.name],
-                    swatch: Color(hex: hex(item.primaryColor.hex))
+                    values: [viewModel.draftColor.name],
+                    swatch: Color(hex: hex(viewModel.draftColor.hex)),
+                    onEdit: { viewModel.beginEdit(.color) }
                 )
             }
 

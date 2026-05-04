@@ -1,6 +1,11 @@
 import PhotosUI
 import SwiftUI
 
+enum AttributeField: Identifiable, Hashable {
+    case type, seasons, occasions, color
+    var id: Self { self }
+}
+
 @MainActor
 @Observable
 final class ScanReviewViewModel {
@@ -10,6 +15,12 @@ final class ScanReviewViewModel {
     var isLibraryPresented = false
     var isCameraPresented = false
     var loadError: String?
+
+    var draftType: ItemType = SampleData.scanCandidate.type
+    var draftSeasons: Set<Season> = SampleData.scanCandidate.seasons
+    var draftOccasions: Set<Occasion> = SampleData.scanCandidate.occasions
+    var draftColor: ColorTag = SampleData.scanCandidate.primaryColor
+    var editingField: AttributeField?
 
     private var loadTask: Task<Void, Never>?
 
@@ -23,6 +34,40 @@ final class ScanReviewViewModel {
 
     func chooseCamera() {
         isCameraPresented = true
+    }
+
+    func beginEdit(_ field: AttributeField) {
+        editingField = field
+    }
+
+    func endEdit() {
+        editingField = nil
+    }
+
+    func setType(_ type: ItemType) {
+        draftType = type
+        endEdit()
+    }
+
+    func toggleSeason(_ season: Season) {
+        if draftSeasons.contains(season) {
+            draftSeasons.remove(season)
+        } else {
+            draftSeasons.insert(season)
+        }
+    }
+
+    func toggleOccasion(_ occasion: Occasion) {
+        if draftOccasions.contains(occasion) {
+            draftOccasions.remove(occasion)
+        } else {
+            draftOccasions.insert(occasion)
+        }
+    }
+
+    func setColor(_ color: ColorTag) {
+        draftColor = color
+        endEdit()
     }
 
     func handlePickerSelection(_ item: PhotosPickerItem?) {

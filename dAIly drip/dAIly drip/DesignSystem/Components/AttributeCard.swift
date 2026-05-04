@@ -9,7 +9,7 @@ struct AttributeCard: View {
     var onEdit: () -> Void = {}
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
                 Text(label)
                     .appFont(.labelMd)
@@ -23,22 +23,28 @@ struct AttributeCard: View {
                 }
                 .buttonStyle(.plain)
             }
-            Spacer()
-            HStack(spacing: Spacing.stackSm + 4) {
-                if let swatch {
-                    Circle()
-                        .fill(swatch)
-                        .frame(width: 24, height: 24)
-                        .overlay { Circle().stroke(AppColor.outlineVariant, lineWidth: 1) }
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(values, id: \.self) { value in
-                        Text(value)
-                            .appFont(.headlineMd)
-                            .foregroundStyle(AppColor.onSurface)
+
+            ScrollView(.vertical) {
+                HStack(alignment: .top, spacing: Spacing.stackSm + 4) {
+                    if let swatch {
+                        Circle()
+                            .fill(swatch)
+                            .frame(width: 24, height: 24)
+                            .overlay { Circle().stroke(AppColor.outlineVariant, lineWidth: 1) }
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(values, id: \.self) { value in
+                            Text(value)
+                                .appFont(.headlineMd)
+                                .foregroundStyle(AppColor.onSurface)
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .scrollIndicators(.hidden)
+            .defaultScrollAnchor(.bottom)
+            .frame(maxHeight: .infinity)
         }
         .padding(Spacing.stackMd)
         .frame(height: 128, alignment: .topLeading)
@@ -48,6 +54,7 @@ struct AttributeCard: View {
             RoundedRectangle(cornerRadius: Radius.md)
                 .stroke(AppColor.outlineVariant.opacity(0.4), lineWidth: 1)
         }
+        .clipShape(RoundedRectangle(cornerRadius: Radius.md))
     }
 }
 
