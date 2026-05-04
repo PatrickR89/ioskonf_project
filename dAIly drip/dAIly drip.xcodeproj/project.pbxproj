@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C2D3676D2FA8B2290038A85F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C2D3676C2FA8B2290038A85F /* GoogleService-Info.plist */; };
+		C2D367702FA8B4390038A85F /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = C2D3676F2FA8B4390038A85F /* FirebaseAI */; };
+		C2D367722FA8B4390038A85F /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367712FA8B4390038A85F /* FirebaseAILogic */; };
+		C2D367742FA8B4390038A85F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367732FA8B4390038A85F /* FirebaseCore */; };
+		C2D367762FA8B4390038A85F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367752FA8B4390038A85F /* FirebaseFirestore */; };
+		C2D367782FA8B4390038A85F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367772FA8B4390038A85F /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CDEF937C2FA8AE850062DAF9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +33,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C2D3676C2FA8B2290038A85F /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CDEF936E2FA8AE840062DAF9 /* dAIly drip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "dAIly drip.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDEF937B2FA8AE850062DAF9 /* dAIly dripTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "dAIly dripTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDEF93852FA8AE860062DAF9 /* dAIly dripUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "dAIly dripUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +62,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2D367722FA8B4390038A85F /* FirebaseAILogic in Frameworks */,
+				C2D367762FA8B4390038A85F /* FirebaseFirestore in Frameworks */,
+				C2D367742FA8B4390038A85F /* FirebaseCore in Frameworks */,
+				C2D367782FA8B4390038A85F /* FirebaseStorage in Frameworks */,
+				C2D367702FA8B4390038A85F /* FirebaseAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +90,7 @@
 		CDEF93652FA8AE840062DAF9 = {
 			isa = PBXGroup;
 			children = (
+				C2D3676C2FA8B2290038A85F /* GoogleService-Info.plist */,
 				CDEF93702FA8AE840062DAF9 /* dAIly drip */,
 				CDEF937E2FA8AE850062DAF9 /* dAIly dripTests */,
 				CDEF93882FA8AE860062DAF9 /* dAIly dripUITests */,
@@ -112,6 +128,11 @@
 			);
 			name = "dAIly drip";
 			packageProductDependencies = (
+				C2D3676F2FA8B4390038A85F /* FirebaseAI */,
+				C2D367712FA8B4390038A85F /* FirebaseAILogic */,
+				C2D367732FA8B4390038A85F /* FirebaseCore */,
+				C2D367752FA8B4390038A85F /* FirebaseFirestore */,
+				C2D367772FA8B4390038A85F /* FirebaseStorage */,
 			);
 			productName = "dAIly drip";
 			productReference = CDEF936E2FA8AE840062DAF9 /* dAIly drip.app */;
@@ -195,6 +216,9 @@
 			);
 			mainGroup = CDEF93652FA8AE840062DAF9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CDEF936F2FA8AE840062DAF9 /* Products */;
 			projectDirPath = "";
@@ -212,6 +236,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2D3676D2FA8B2290038A85F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,6 +595,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C2D3676F2FA8B4390038A85F /* FirebaseAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAI;
+		};
+		C2D367712FA8B4390038A85F /* FirebaseAILogic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAILogic;
+		};
+		C2D367732FA8B4390038A85F /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		C2D367752FA8B4390038A85F /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		C2D367772FA8B4390038A85F /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CDEF93662FA8AE840062DAF9 /* Project object */;
 }
