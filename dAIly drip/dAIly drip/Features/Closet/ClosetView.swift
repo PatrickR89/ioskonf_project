@@ -3,7 +3,6 @@ import SwiftUI
 struct ClosetView: View {
     @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var selectedFilter: ItemType? = nil
-    @State private var showAddSheet = false
 
     private let columns = [
         GridItem(.flexible(), spacing: Spacing.gutter),
@@ -11,36 +10,21 @@ struct ClosetView: View {
     ]
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            VStack(spacing: 0) {
-                DAIlyDripTopBar(leadingTinted: true, trailingTinted: true)
+        VStack(spacing: 0) {
+            DAIlyDripTopBar(leadingTinted: true, trailingTinted: true)
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Spacing.stackLg) {
-                        header
-                        filterRow
-                        grid
-                    }
-                    .padding(.horizontal, Spacing.containerMargin)
-                    .padding(.top, Spacing.stackLg)
-                    .padding(.bottom, Spacing.stackXl + Spacing.stackLg)
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.stackLg) {
+                    header
+                    filterRow
+                    grid
                 }
+                .padding(.horizontal, Spacing.containerMargin)
+                .padding(.top, Spacing.stackLg)
+                .padding(.bottom, Spacing.stackXl + Spacing.stackLg)
             }
-
-            fab
-                .padding(.trailing, Spacing.containerMargin)
-                .padding(.bottom, Spacing.stackLg)
         }
         .background(AppColor.background)
-        .confirmationDialog(
-            "Add an item",
-            isPresented: $showAddSheet,
-            titleVisibility: .visible
-        ) {
-            Button("Take Photo") {}
-            Button("Choose from Library") {}
-            Button("Cancel", role: .cancel) {}
-        }
     }
 
     private var header: some View {
@@ -142,7 +126,7 @@ struct ClosetView: View {
             Text("Nothing here yet")
                 .appFont(.headlineMd)
                 .foregroundStyle(AppColor.onSurface)
-            Text("Tap the plus button to add your first \(selectedFilter?.displayName.lowercased() ?? "closet") item.")
+            Text("No \(selectedFilter?.displayName.lowercased() ?? "closet") items yet.")
                 .appFont(.bodyMd)
                 .foregroundStyle(AppColor.secondary)
                 .multilineTextAlignment(.center)
@@ -151,21 +135,7 @@ struct ClosetView: View {
         .padding(.vertical, Spacing.stackXl)
     }
 
-    private var fab: some View {
-        Button {
-            showAddSheet = true
-        } label: {
-            Label("Add item", systemImage: "plus")
-                .labelStyle(.iconOnly)
-                .font(.system(size: 28, weight: .regular))
-                .frame(width: 56, height: 56)
-                .foregroundStyle(AppColor.onPrimary)
-                .background(AppColor.primary, in: Circle())
-                .ambientShadow(blur: 24, y: 6, opacity: 0.18)
-        }
-        .buttonStyle(.pressable)
-        .accessibilityLabel("Add item to closet")
-    }
+
 }
 
 #Preview {
