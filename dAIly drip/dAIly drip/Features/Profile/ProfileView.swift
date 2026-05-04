@@ -23,7 +23,7 @@ struct ProfileView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            StyleAITopBar(trailingTinted: true)
+            DAIlyDripTopBar(trailingTinted: true)
             ScrollView {
                 VStack(spacing: Spacing.stackXl) {
                     hero

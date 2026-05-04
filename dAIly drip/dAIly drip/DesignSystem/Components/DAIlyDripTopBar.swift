@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct StyleAITopBar: View {
+struct DAIlyDripTopBar: View {
     enum Leading { case menu, close, none }
 
     var leading: Leading = .menu
@@ -14,7 +14,7 @@ struct StyleAITopBar: View {
             leadingButton
                 .frame(width: 32, height: 32, alignment: .leading)
             Spacer()
-            StyleAIWordmark()
+            DAIlyDripWordmark()
             Spacer()
             Button(action: trailingAction) {
                 Label("Account", systemImage: "person.crop.circle")
@@ -59,9 +59,9 @@ struct StyleAITopBar: View {
 
 #Preview {
     VStack(spacing: 0) {
-        StyleAITopBar()
-        StyleAITopBar(leading: .close)
-        StyleAITopBar(leadingTinted: true, trailingTinted: true)
+        DAIlyDripTopBar()
+        DAIlyDripTopBar(leading: .close)
+        DAIlyDripTopBar(leadingTinted: true, trailingTinted: true)
     }
     .background(AppColor.surface)
 }

@@ -12,7 +12,7 @@ struct OutfitGeneratorView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            StyleAITopBar()
+            DAIlyDripTopBar()
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.stackXl) {
                     header

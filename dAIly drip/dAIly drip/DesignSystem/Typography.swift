@@ -86,10 +86,10 @@ private struct AppFontModifier: ViewModifier {
     }
 }
 
-/// "StyleAI" wordmark — Noto Serif italic in the mockups.
-struct StyleAIWordmark: View {
+/// "DAIly Drip" wordmark — Noto Serif italic in the mockups.
+struct DAIlyDripWordmark: View {
     var body: some View {
-        Text("StyleAI")
+        Text("DAIly Drip")
             .font(.system(size: 24, weight: .medium, design: .serif).italic())
             .foregroundStyle(AppColor.onSurface)
             .accessibilityAddTraits(.isHeader)

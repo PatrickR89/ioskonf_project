@@ -9,7 +9,7 @@ struct ScanReviewView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                StyleAITopBar(leading: .close)
+                DAIlyDripTopBar(leading: .close)
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.stackLg) {
                         canvas

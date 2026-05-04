@@ -13,7 +13,7 @@ struct ClosetView: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 0) {
-                StyleAITopBar(leadingTinted: true, trailingTinted: true)
+                DAIlyDripTopBar(leadingTinted: true, trailingTinted: true)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.stackLg) {

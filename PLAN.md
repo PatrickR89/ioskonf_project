@@ -1,10 +1,10 @@
-# Plan — `dAIly drip` iOS app (StyleAI wardrobe + outfit generator)
+# Plan — `dAIly drip` iOS app (DAIly Drip wardrobe + outfit generator)
 
 > Per user request, after approval this file should be copied to `/Users/patrick/ioskonf_project/PLAN.md` (the repo root) as the first implementation step.
 
 ## Context
 
-The repo contains a fresh Xcode SwiftUI skeleton (`dAIly drip/`, bundle id `io.iosKonf.dAIly-drip`, iOS 26.2 deployment target, no dependencies) and a complete set of HTML/PNG mockups in `stitch_design/` covering 4 screens plus a design-system spec. The goal is to turn that skeleton into a shippable iOS app — codenamed **StyleAI** in the mockups — that:
+The repo contains a fresh Xcode SwiftUI skeleton (`dAIly drip/`, bundle id `io.iosKonf.dAIly-drip`, iOS 26.2 deployment target, no dependencies) and a complete set of HTML/PNG mockups in `stitch_design/` covering 4 screens plus a design-system spec. The goal is to turn that skeleton into a shippable iOS app — codenamed **DAIly Drip** in the mockups — that:
 
 1. Onboards each user with a free-form (text or voice) self-description and uses AI to extract a structured style profile (gender, age, preferred styles, colors, vibe).
 2. Lets the user build a digital **closet** by photographing garments; AI categorizes each item (type, season, occasion, dominant color) and the user can edit the suggestion before saving.
@@ -138,7 +138,7 @@ Display + headline use Noto Serif (editorial authority); body, buttons, labels u
 | `label-lg` | Manrope | 14 | 600 | 20 | +0.05em, UPPERCASE |
 | `label-md` | Manrope | 12 | 600 | 16 | +0.05em, UPPERCASE |
 
-The "StyleAI" wordmark is **Noto Serif italic** (per the mockups; not a discrete token, but always render the brand mark this way).
+The "DAIly Drip" wordmark is **Noto Serif italic** (per the mockups; not a discrete token, but always render the brand mark this way).
 
 ### 2.4 Spacing (4px base)
 
@@ -200,8 +200,8 @@ Files to create under `dAIly drip/DesignSystem/`:
 | `Components/FloatingLabelTextField.swift` | 1px bottom border, animated label, supports multi-line for the onboarding prompt. |
 | `Components/ItemCard.swift` | 3:4 aspect image + name + chips, 16px radius, ambient shadow (20px blur, 5% charcoal). |
 | `Components/BentoOutfitCard.swift` | 1 large 3:4 left + 2 stacked squares right, "Option 0X" label, italic Noto Serif title, "Wear This" CTA. |
-| `Components/StyleAITopBar.swift` | Menu icon · "StyleAI" Noto Serif italic wordmark · account icon. |
-| `Components/StyleAITabBar.swift` | Custom 4-tab bar (Closet / Generate / Scan / Profile) using SF Symbol thin-stroke icons + label-md serif labels; gold-tinted active state. |
+| `Components/DAIlyDripTopBar.swift` | Menu icon · "DAIly Drip" Noto Serif italic wordmark · account icon. |
+| `Components/DAIlyDripTabBar.swift` | Custom 4-tab bar (Closet / Generate / Scan / Profile) using SF Symbol thin-stroke icons + label-md serif labels; gold-tinted active state. |
 
 **Fonts:** add Noto Serif (regular, italic, 500, 600) and Manrope (400, 600) via `.ttf`/`.otf` files in `Resources/Fonts/`, registered in the target's `UIAppFonts` Info.plist key (set via build setting since the project has no Info.plist file).
 
@@ -326,14 +326,14 @@ Each feature folder owns its `View` + `ViewModel` (the latter `@Observable`, `@M
 - `ProfileView` — show extracted profile chips, "Re-do my profile" button (re-enters `OnboardingFlowView` modally), "Sign out / delete account" affordances (later).
 
 ### 6.6 Root
-- `RootView` — switches between `OnboardingFlowView` (cover) and a `TabView` with the four tabs, using `StyleAITabBar` overlay (or iOS 26 `Tab` + custom `tabBarMinimizeBehavior`).
+- `RootView` — switches between `OnboardingFlowView` (cover) and a `TabView` with the four tabs, using `DAIlyDripTabBar` overlay (or iOS 26 `Tab` + custom `tabBarMinimizeBehavior`).
 - `dAIly_dripApp.swift` — `FirebaseApp.configure()`, injects `AuthService`, `ProfileRepository`, `ClosetRepository`, `OutfitRepository`, `AIService`, `SpeechService` into the environment.
 
 ## Phase 7 — Permissions (Info.plist via build settings)
 
 Add the following usage descriptions:
 
-- `NSCameraUsageDescription` — "Take photos of your wardrobe so StyleAI can categorize them."
+- `NSCameraUsageDescription` — "Take photos of your wardrobe so DAIly Drip can categorize them."
 - `NSPhotoLibraryUsageDescription` — "Choose existing photos to add to your closet."
 - `NSMicrophoneUsageDescription` — "Dictate your style profile and outfit prompts."
 - `NSSpeechRecognitionUsageDescription` — "Convert your voice to text for profile and outfit prompts."
