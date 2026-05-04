@@ -168,6 +168,14 @@ struct ProfileView: View {
                 closetRepository.updateUserProfile(profile)
                 description = profile.rawDescription
             } catch {
+                BackendLogger.error(
+                    "Profile extraction failed in UI flow; preserving raw description",
+                    error: error,
+                    metadata: [
+                        "descriptionCharacters": trimmedDescription.count,
+                        "descriptionPreview": BackendLogger.preview(trimmedDescription),
+                    ]
+                )
                 var profile = closetRepository.userProfile
                 profile.rawDescription = trimmedDescription
                 closetRepository.updateUserProfile(profile)

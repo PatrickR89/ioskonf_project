@@ -2,6 +2,9 @@ import FirebaseAILogic
 import Foundation
 
 struct ProfileExtractionService: Sendable {
+    private static let backendName = "Gemini Developer API"
+    private static let modelName = "gemini-2.5-flash-lite"
+
     private struct ExtractedProfile: Decodable {
         var age: Int?
         var gender: String?
@@ -22,8 +25,20 @@ struct ProfileExtractionService: Sendable {
     }
 
     func extractProfile(from description: String, currentProfile: UserProfile) async throws -> UserProfile {
+        let requestPrompt = Self.prompt(for: description)
+        BackendLogger.info(
+            "Starting profile extraction",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "descriptionCharacters": description.count,
+                "promptCharacters": requestPrompt.count,
+                "hasExistingProfile": currentProfile.rawDescription.isEmpty == false,
+            ]
+        )
+
         let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-            modelName: "gemini-2.5-flash-lite",
+            modelName: Self.modelName,
             generationConfig: GenerationConfig(
                 temperature: 0.2,
                 maxOutputTokens: 256,
@@ -33,16 +48,67 @@ struct ProfileExtractionService: Sendable {
             systemInstruction: ModelContent(parts: Self.systemInstruction)
         )
 
-        let response = try await model.generateContent(Self.prompt(for: description))
+        let response = try await {
+            do {
+                return try await model.generateContent(requestPrompt)
+            } catch {
+                BackendLogger.error(
+                    "Firebase AI profile extraction request failed",
+                    error: error,
+                    metadata: [
+                        "backend": Self.backendName,
+                        "model": Self.modelName,
+                        "descriptionPreview": BackendLogger.preview(description),
+                        "promptCharacters": requestPrompt.count,
+                    ]
+                )
+                throw error
+            }
+        }()
+
         guard let responseText = response.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               !responseText.isEmpty else {
+            BackendLogger.error(
+                "Firebase AI profile extraction returned an empty response",
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "descriptionCharacters": description.count,
+                ]
+            )
             throw ExtractionError.emptyResponse
         }
 
-        let extractedProfile = try JSONDecoder().decode(
-            ExtractedProfile.self,
-            from: Data(Self.sanitizedJSON(responseText).utf8)
+        BackendLogger.info(
+            "Firebase AI profile extraction response received",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "responseCharacters": responseText.count,
+                "responsePreview": BackendLogger.preview(responseText),
+            ]
         )
+
+        let sanitizedResponseText = Self.sanitizedJSON(responseText)
+        let extractedProfile: ExtractedProfile
+        do {
+            extractedProfile = try JSONDecoder().decode(
+                ExtractedProfile.self,
+                from: Data(sanitizedResponseText.utf8)
+            )
+        } catch {
+            BackendLogger.error(
+                "Failed to decode Firebase AI profile extraction response",
+                error: error,
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "sanitizedResponseCharacters": sanitizedResponseText.count,
+                    "sanitizedResponsePreview": BackendLogger.preview(sanitizedResponseText),
+                ]
+            )
+            throw error
+        }
 
         var profile = currentProfile
         profile.rawDescription = description
@@ -51,6 +117,19 @@ struct ProfileExtractionService: Sendable {
         profile.preferredStyles = Self.normalizedList(extractedProfile.preferredStyles)
         profile.preferredColors = Self.normalizedList(extractedProfile.preferredColors)
         profile.vibe = Self.normalizedText(extractedProfile.vibe)
+
+        BackendLogger.info(
+            "Profile extraction completed",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "age": profile.age,
+                "gender": profile.gender?.rawValue,
+                "styleCount": profile.preferredStyles.count,
+                "colorCount": profile.preferredColors.count,
+                "hasVibe": profile.vibe != nil,
+            ]
+        )
 
         return profile
     }

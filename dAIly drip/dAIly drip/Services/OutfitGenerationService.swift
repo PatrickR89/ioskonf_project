@@ -2,6 +2,9 @@ import FirebaseAILogic
 import Foundation
 
 struct OutfitGenerationService: Sendable {
+    private static let backendName = "Gemini Developer API"
+    private static let modelName = "gemini-2.5-flash-lite"
+
     private struct OutfitResponse: Decodable {
         var outfits: [GeneratedOutfit]
     }
@@ -35,11 +38,46 @@ struct OutfitGenerationService: Sendable {
         closetItems: [ClosetItem]
     ) async throws -> [Outfit] {
         guard !closetItems.isEmpty else {
+            BackendLogger.warning(
+                "Outfit generation skipped because closet is empty",
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "promptPreview": BackendLogger.preview(prompt),
+                ]
+            )
             throw GenerationError.emptyCloset
         }
 
+        let requestPrompt = Self.prompt(
+            prompt: prompt,
+            userProfile: userProfile,
+            closetItems: closetItems
+        )
+        let itemCountsByType = Dictionary(grouping: closetItems, by: { $0.type.rawValue })
+            .mapValues(\.count)
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key):\($0.value)" }
+            .joined(separator: ",")
+
+        BackendLogger.info(
+            "Starting outfit generation",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "closetItemCount": closetItems.count,
+                "closetItemCountsByType": itemCountsByType,
+                "promptCharacters": prompt.count,
+                "requestCharacters": requestPrompt.count,
+                "profileHasAge": userProfile.age != nil,
+                "profileStyleCount": userProfile.preferredStyles.count,
+                "profileColorCount": userProfile.preferredColors.count,
+                "promptPreview": BackendLogger.preview(prompt),
+            ]
+        )
+
         let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-            modelName: "gemini-2.5-flash-lite",
+            modelName: Self.modelName,
             generationConfig: GenerationConfig(
                 temperature: 0.35,
                 maxOutputTokens: 512,
@@ -49,23 +87,69 @@ struct OutfitGenerationService: Sendable {
             systemInstruction: ModelContent(parts: Self.systemInstruction)
         )
 
-        let response = try await model.generateContent(
-            Self.prompt(
-                prompt: prompt,
-                userProfile: userProfile,
-                closetItems: closetItems
-            )
-        )
+        let response = try await {
+            do {
+                return try await model.generateContent(requestPrompt)
+            } catch {
+                BackendLogger.error(
+                    "Firebase AI outfit generation request failed",
+                    error: error,
+                    metadata: [
+                        "backend": Self.backendName,
+                        "model": Self.modelName,
+                        "closetItemCount": closetItems.count,
+                        "requestCharacters": requestPrompt.count,
+                        "promptPreview": BackendLogger.preview(prompt),
+                    ]
+                )
+                throw error
+            }
+        }()
 
         guard let responseText = response.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               !responseText.isEmpty else {
+            BackendLogger.error(
+                "Firebase AI outfit generation returned an empty response",
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "closetItemCount": closetItems.count,
+                    "requestCharacters": requestPrompt.count,
+                ]
+            )
             throw GenerationError.emptyResponse
         }
 
-        let decodedResponse = try JSONDecoder().decode(
-            OutfitResponse.self,
-            from: Data(Self.sanitizedJSON(responseText).utf8)
+        BackendLogger.info(
+            "Firebase AI outfit generation response received",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "responseCharacters": responseText.count,
+                "responsePreview": BackendLogger.preview(responseText),
+            ]
         )
+
+        let sanitizedResponseText = Self.sanitizedJSON(responseText)
+        let decodedResponse: OutfitResponse
+        do {
+            decodedResponse = try JSONDecoder().decode(
+                OutfitResponse.self,
+                from: Data(sanitizedResponseText.utf8)
+            )
+        } catch {
+            BackendLogger.error(
+                "Failed to decode Firebase AI outfit generation response",
+                error: error,
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "sanitizedResponseCharacters": sanitizedResponseText.count,
+                    "sanitizedResponsePreview": BackendLogger.preview(sanitizedResponseText),
+                ]
+            )
+            throw error
+        }
 
         let validatedOutfits = decodedResponse.outfits
             .prefix(3)
@@ -78,10 +162,21 @@ struct OutfitGenerationService: Sendable {
             }
 
         guard !validatedOutfits.isEmpty else {
+            BackendLogger.error(
+                "No complete outfits remained after local validation",
+                metadata: [
+                    "backend": Self.backendName,
+                    "model": Self.modelName,
+                    "rawOutfitCount": decodedResponse.outfits.count,
+                    "closetItemCount": closetItems.count,
+                    "closetItemCountsByType": itemCountsByType,
+                    "rawItemIds": decodedResponse.outfits.map { $0.itemIds.joined(separator: ",") }.joined(separator: " | "),
+                ]
+            )
             throw GenerationError.noCompleteOutfits
         }
 
-        return validatedOutfits.enumerated().map { index, outfit in
+        let outfits = validatedOutfits.enumerated().map { index, outfit in
             Outfit(
                 id: "generated-\(UUID().uuidString)",
                 prompt: prompt,
@@ -92,6 +187,19 @@ struct OutfitGenerationService: Sendable {
                 createdAt: .now
             )
         }
+
+        BackendLogger.info(
+            "Outfit generation completed",
+            metadata: [
+                "backend": Self.backendName,
+                "model": Self.modelName,
+                "rawOutfitCount": decodedResponse.outfits.count,
+                "validatedOutfitCount": outfits.count,
+                "selectedItemIds": outfits.map { $0.itemIds.joined(separator: ",") }.joined(separator: " | "),
+            ]
+        )
+
+        return outfits
     }
 
     private static let responseSchema = Schema.object(

@@ -21,10 +21,25 @@ final class ClosetRepository: ObservableObject {
             closetItems = snapshot.closetItems
             userProfile = snapshot.userProfile
             generatedOutfits = snapshot.generatedOutfits
+            BackendLogger.info(
+                "Loaded closet repository snapshot",
+                metadata: [
+                    "closetItemCount": snapshot.closetItems.count,
+                    "generatedOutfitCount": snapshot.generatedOutfits.count,
+                    "hasUserDescription": snapshot.userProfile.rawDescription.isEmpty == false,
+                ]
+            )
         } else {
             closetItems = seedSnapshot.closetItems
             userProfile = seedSnapshot.userProfile
             generatedOutfits = seedSnapshot.generatedOutfits
+            BackendLogger.info(
+                "Initialized closet repository from seed snapshot",
+                metadata: [
+                    "closetItemCount": seedSnapshot.closetItems.count,
+                    "generatedOutfitCount": seedSnapshot.generatedOutfits.count,
+                ]
+            )
             persist()
         }
     }
@@ -62,11 +77,19 @@ final class ClosetRepository: ObservableObject {
 
     func updateGeneratedOutfits(_ outfits: [Outfit]) {
         generatedOutfits = outfits
+        BackendLogger.info(
+            "Updating generated outfits",
+            metadata: [
+                "generatedOutfitCount": outfits.count,
+                "itemIds": outfits.map { $0.itemIds.joined(separator: ",") }.joined(separator: " | "),
+            ]
+        )
         persist()
     }
 
     func clearGeneratedOutfits() {
         generatedOutfits = []
+        BackendLogger.info("Cleared generated outfits")
         persist()
     }
 
@@ -138,15 +161,62 @@ struct UserDefaultsClosetStore: ClosetLocalStoring {
 
     func load() -> ClosetRepositorySnapshot? {
         guard let data = defaults.data(forKey: storageKey) else {
+            BackendLogger.info(
+                "No persisted closet repository snapshot found",
+                metadata: ["storageKey": storageKey]
+            )
             return nil
         }
-        return try? decoder.decode(ClosetRepositorySnapshot.self, from: data)
+        do {
+            let snapshot = try decoder.decode(ClosetRepositorySnapshot.self, from: data)
+            BackendLogger.info(
+                "Decoded persisted closet repository snapshot",
+                metadata: [
+                    "storageKey": storageKey,
+                    "dataBytes": data.count,
+                    "closetItemCount": snapshot.closetItems.count,
+                    "generatedOutfitCount": snapshot.generatedOutfits.count,
+                ]
+            )
+            return snapshot
+        } catch {
+            BackendLogger.error(
+                "Failed to decode persisted closet repository snapshot",
+                error: error,
+                metadata: [
+                    "storageKey": storageKey,
+                    "dataBytes": data.count,
+                ]
+            )
+            return nil
+        }
     }
 
     func save(_ snapshot: ClosetRepositorySnapshot) {
-        guard let data = try? encoder.encode(snapshot) else {
+        let data: Data
+        do {
+            data = try encoder.encode(snapshot)
+        } catch {
+            BackendLogger.error(
+                "Failed to encode closet repository snapshot",
+                error: error,
+                metadata: [
+                    "storageKey": storageKey,
+                    "closetItemCount": snapshot.closetItems.count,
+                    "generatedOutfitCount": snapshot.generatedOutfits.count,
+                ]
+            )
             return
         }
         defaults.set(data, forKey: storageKey)
+        BackendLogger.info(
+            "Saved closet repository snapshot",
+            metadata: [
+                "storageKey": storageKey,
+                "dataBytes": data.count,
+                "closetItemCount": snapshot.closetItems.count,
+                "generatedOutfitCount": snapshot.generatedOutfits.count,
+            ]
+        )
     }
 }

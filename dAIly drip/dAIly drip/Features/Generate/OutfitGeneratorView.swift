@@ -162,6 +162,16 @@ struct OutfitGeneratorView: View {
                 )
                 closetRepository.updateGeneratedOutfits(outfits)
             } catch {
+                BackendLogger.error(
+                    "Outfit generation failed in UI flow",
+                    error: error,
+                    metadata: [
+                        "promptPreview": BackendLogger.preview(request),
+                        "closetItemCount": closetRepository.closetItems.count,
+                        "profileHasAge": closetRepository.userProfile.age != nil,
+                        "profileStyleCount": closetRepository.userProfile.preferredStyles.count,
+                    ]
+                )
                 generationError = error.localizedDescription
             }
             isGenerating = false
