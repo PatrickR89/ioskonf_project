@@ -3,7 +3,8 @@ import Foundation
 
 struct ProfileExtractionService: Sendable {
     private static let backendName = "Gemini Developer API"
-    private static let modelName = "gemini-2.5-flash-lite"
+    private static let modelName = "gemini-2.5-flash"
+    private static let backend = Backend.vertexAI()
 
     private struct ExtractedProfile: Decodable {
         var age: Int?
@@ -11,6 +12,19 @@ struct ProfileExtractionService: Sendable {
         var preferredStyles: [String]?
         var preferredColors: [String]?
         var vibe: String?
+        var moodboard: ExtractedMoodboard?
+    }
+
+    private struct ExtractedMoodboard: Decodable {
+        var title: String?
+        var subtitle: String?
+        var tiles: [ExtractedMoodboardTile]?
+    }
+
+    private struct ExtractedMoodboardTile: Decodable {
+        var itemId: String
+        var title: String?
+        var note: String?
     }
 
     enum ExtractionError: LocalizedError {
@@ -24,8 +38,16 @@ struct ProfileExtractionService: Sendable {
         }
     }
 
-    func extractProfile(from description: String, currentProfile: UserProfile) async throws -> UserProfile {
-        let requestPrompt = Self.prompt(for: description)
+    func extractProfile(
+        from description: String,
+        currentProfile: UserProfile,
+        closetItems: [ClosetItem]
+    ) async throws -> UserProfile {
+        let requestPrompt = Self.prompt(
+            for: description,
+            currentProfile: currentProfile,
+            closetItems: closetItems
+        )
         BackendLogger.info(
             "Starting profile extraction",
             metadata: [
@@ -34,14 +56,15 @@ struct ProfileExtractionService: Sendable {
                 "descriptionCharacters": description.count,
                 "promptCharacters": requestPrompt.count,
                 "hasExistingProfile": currentProfile.rawDescription.isEmpty == false,
+                "closetItemCount": closetItems.count,
             ]
         )
 
-        let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
+        let model = FirebaseAI.firebaseAI(backend: Self.backend).generativeModel(
             modelName: Self.modelName,
             generationConfig: GenerationConfig(
                 temperature: 0.2,
-                maxOutputTokens: 256,
+                maxOutputTokens: 5000,
                 responseMIMEType: "application/json",
                 responseSchema: Self.profileSchema
             ),
@@ -117,6 +140,11 @@ struct ProfileExtractionService: Sendable {
         profile.preferredStyles = Self.normalizedList(extractedProfile.preferredStyles)
         profile.preferredColors = Self.normalizedList(extractedProfile.preferredColors)
         profile.vibe = Self.normalizedText(extractedProfile.vibe)
+        profile.moodboard = Self.normalizedMoodboard(
+            extractedProfile.moodboard,
+            closetItems: closetItems,
+            fallback: currentProfile.moodboard
+        )
 
         BackendLogger.info(
             "Profile extraction completed",
@@ -128,6 +156,7 @@ struct ProfileExtractionService: Sendable {
                 "styleCount": profile.preferredStyles.count,
                 "colorCount": profile.preferredColors.count,
                 "hasVibe": profile.vibe != nil,
+                "moodboardTileCount": profile.moodboard.tiles.count,
             ]
         )
 
@@ -157,6 +186,36 @@ struct ProfileExtractionService: Sendable {
                 description: "A short two to four word phrase describing the user's overall outfit mood.",
                 nullable: true
             ),
+            "moodboard": .object(
+                properties: [
+                    "title": .string(
+                        description: "Short editorial heading for the moodboard, two to five words.",
+                        nullable: true
+                    ),
+                    "subtitle": .string(
+                        description: "One concise sentence about the style direction anchored in the profile and closet.",
+                        nullable: true
+                    ),
+                    "tiles": .array(
+                        items: .object(
+                            properties: [
+                                "itemId": .string(description: "A closet item ID from the provided catalog."),
+                                "title": .string(
+                                    description: "Two to four word styling label for this tile.",
+                                    nullable: true
+                                ),
+                                "note": .string(
+                                    description: "One short sentence explaining why this closet item belongs in the moodboard.",
+                                    nullable: true
+                                ),
+                            ],
+                            propertyOrdering: ["itemId", "title", "note"]
+                        ),
+                        description: "Exactly three moodboard tiles using distinct closet item IDs."
+                    ),
+                ],
+                propertyOrdering: ["title", "subtitle", "tiles"]
+            ),
         ],
         propertyOrdering: [
             "age",
@@ -164,6 +223,7 @@ struct ProfileExtractionService: Sendable {
             "preferredStyles",
             "preferredColors",
             "vibe",
+            "moodboard",
         ]
     )
 
@@ -172,12 +232,26 @@ struct ProfileExtractionService: Sendable {
     Return only details grounded in the description. Prefer concise, reusable wardrobe taxonomy.
     Extract age as an integer when the user states it, such as "I'm 28" or "28 years old".
     Do not invent age. Use gender preferNotToSay unless the text clearly identifies gender.
+    For the moodboard, use only closet item IDs from the catalog and anchor the notes in the described aesthetic, colors, materials, and silhouettes.
     """
 
-    private static func prompt(for description: String) -> String {
+    private static func prompt(
+        for description: String,
+        currentProfile: UserProfile,
+        closetItems: [ClosetItem]
+    ) -> String {
         """
         Extract a complete user style profile from this description.
-        Include age, gender, preferredStyles, preferredColors, and vibe in the JSON response.
+        Include age, gender, preferredStyles, preferredColors, vibe, and moodboard in the JSON response.
+
+        Build the moodboard from the closet catalog. Select exactly three distinct items that best represent the described style direction.
+        Favor items that align with the description's materials, palette, and silhouette language.
+
+        Existing profile context:
+        \(profileSummary(currentProfile))
+
+        Closet catalog:
+        \(closetSummary(closetItems))
 
         \(description)
         """
@@ -224,5 +298,77 @@ struct ProfileExtractionService: Sendable {
         }
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmedValue.isEmpty ? nil : trimmedValue
+    }
+
+    private static func normalizedMoodboard(
+        _ moodboard: ExtractedMoodboard?,
+        closetItems: [ClosetItem],
+        fallback: MoodboardInspiration
+    ) -> MoodboardInspiration {
+        guard let moodboard else {
+            return fallback
+        }
+
+        let itemById = Dictionary(uniqueKeysWithValues: closetItems.map { ($0.id, $0) })
+        var seenItemIDs = Set<String>()
+
+        let tiles = (moodboard.tiles ?? [])
+            .compactMap { tile -> MoodboardTile? in
+                let itemId = normalizedText(tile.itemId)
+                guard let itemId,
+                      itemById[itemId] != nil,
+                      seenItemIDs.insert(itemId).inserted else {
+                    return nil
+                }
+
+                let itemName = itemById[itemId]?.name ?? "Closet Item"
+                return MoodboardTile(
+                    id: "moodboard-\(itemId)",
+                    itemId: itemId,
+                    title: normalizedText(tile.title) ?? itemName,
+                    note: normalizedText(tile.note) ?? "Supports the overall style direction."
+                )
+            }
+            .prefix(3)
+
+        guard !tiles.isEmpty else {
+            return fallback
+        }
+
+        return MoodboardInspiration(
+            title: normalizedText(moodboard.title),
+            subtitle: normalizedText(moodboard.subtitle),
+            tiles: Array(tiles)
+        )
+    }
+
+    private static func profileSummary(_ profile: UserProfile) -> String {
+        [
+            profile.age.map { "age: \($0)" },
+            profile.gender.map { "gender: \($0.rawValue)" },
+            profile.preferredStyles.isEmpty ? nil : "styles: \(profile.preferredStyles.joined(separator: ", "))",
+            profile.preferredColors.isEmpty ? nil : "colors: \(profile.preferredColors.joined(separator: ", "))",
+            profile.vibe.map { "vibe: \($0)" },
+        ]
+        .compactMap { $0 }
+        .joined(separator: "\n")
+    }
+
+    private static func closetSummary(_ closetItems: [ClosetItem]) -> String {
+        closetItems.map { item in
+            let seasons = item.seasons.map(\.displayName).sorted().joined(separator: ", ")
+            let occasions = item.occasions.map(\.displayName).sorted().joined(separator: ", ")
+            let materials = item.materials.joined(separator: ", ")
+            return """
+            - id: \(item.id)
+              name: \(item.name)
+              type: \(item.type.rawValue)
+              color: \(item.primaryColor.name)
+              materials: \(materials)
+              seasons: \(seasons)
+              occasions: \(occasions)
+            """
+        }
+        .joined(separator: "\n")
     }
 }

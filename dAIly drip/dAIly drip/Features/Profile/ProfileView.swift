@@ -14,6 +14,13 @@ struct ProfileView: View {
         let value: String
     }
 
+    private struct MoodboardDisplayTile: Identifiable {
+        let id: String
+        let item: ClosetItem
+        let title: String
+        let note: String
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             StyleAITopBar(trailingTinted: true)
@@ -104,7 +111,7 @@ struct ProfileView: View {
             if isExtractingProfile {
                 HStack(spacing: Spacing.stackSm) {
                     ProgressView()
-                    Text("Reading style description")
+                    Text("Reading profile and curating moodboard")
                         .appFont(.labelMd)
                         .foregroundStyle(AppColor.secondary)
                 }
@@ -163,7 +170,8 @@ struct ProfileView: View {
             do {
                 let profile = try await profileExtractionService.extractProfile(
                     from: trimmedDescription,
-                    currentProfile: closetRepository.userProfile
+                    currentProfile: closetRepository.userProfile,
+                    closetItems: closetRepository.closetItems
                 )
                 closetRepository.updateUserProfile(profile)
                 description = profile.rawDescription
@@ -186,32 +194,115 @@ struct ProfileView: View {
     }
 
     private var moodboard: some View {
-        VStack(alignment: .center, spacing: Spacing.stackLg) {
-            Text("Moodboard Inspiration")
-                .appFont(.headlineLg)
-                .foregroundStyle(AppColor.onSurface)
+        VStack(alignment: .leading, spacing: Spacing.stackLg) {
+            VStack(alignment: .leading, spacing: Spacing.stackSm) {
+                Text(closetRepository.userProfile.moodboard.title ?? "Moodboard Inspiration")
+                    .appFont(.headlineLg)
+                    .foregroundStyle(AppColor.onSurface)
 
-            HStack(spacing: Spacing.gutter) {
-                moodboardTile(symbol: "person.fill")
-                    .aspectRatio(3.0/4.0, contentMode: .fit)
-                VStack(spacing: Spacing.gutter) {
-                    moodboardTile(symbol: "circle.grid.2x2")
-                        .aspectRatio(1, contentMode: .fit)
-                    moodboardTile(symbol: "sparkles.tv")
-                        .aspectRatio(1, contentMode: .fit)
+                if let subtitle = closetRepository.userProfile.moodboard.subtitle {
+                    Text(subtitle)
+                        .appFont(.bodyMd)
+                        .foregroundStyle(AppColor.secondary)
+                }
+            }
+
+            if moodboardTiles.isEmpty {
+                RoundedRectangle(cornerRadius: Radius.lg)
+                    .fill(AppColor.surfaceContainerLowest)
+                    .overlay {
+                        VStack(spacing: Spacing.stackSm) {
+                            Image(systemName: "sparkles.tv")
+                                .font(.system(size: 28, weight: .light))
+                                .foregroundStyle(AppColor.outline)
+                            Text("Build your profile to generate closet-based inspiration.")
+                                .appFont(.bodyMd)
+                                .foregroundStyle(AppColor.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(Spacing.stackLg)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(3.0 / 2.15, contentMode: .fit)
+            } else {
+                HStack(spacing: Spacing.gutter) {
+                    if let leadTile = moodboardTiles.first {
+                        moodboardTile(leadTile, compact: false)
+                            .aspectRatio(3.0 / 4.0, contentMode: .fit)
+                    }
+
+                    VStack(spacing: Spacing.gutter) {
+                        ForEach(Array(moodboardTiles.dropFirst().prefix(2))) { tile in
+                            moodboardTile(tile, compact: true)
+                                .aspectRatio(1, contentMode: .fit)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private func moodboardTile(symbol: String) -> some View {
-        ZStack {
-            AppColor.surfaceContainer
-            Image(systemName: symbol)
-                .font(.system(size: 36, weight: .ultraLight))
-                .foregroundStyle(AppColor.outline)
+    private var moodboardTiles: [MoodboardDisplayTile] {
+        let itemsById = Dictionary(uniqueKeysWithValues: closetRepository.closetItems.map { ($0.id, $0) })
+        return closetRepository.userProfile.moodboard.tiles.compactMap { tile in
+            guard let item = itemsById[tile.itemId] else {
+                return nil
+            }
+
+            return MoodboardDisplayTile(
+                id: tile.id,
+                item: item,
+                title: tile.title,
+                note: tile.note
+            )
         }
+    }
+
+    private func moodboardTile(_ tile: MoodboardDisplayTile, compact: Bool) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            Group {
+                if let imageName = tile.item.imagePath {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Rectangle()
+                        .fill(AppColor.surfaceContainer)
+                        .overlay {
+                            Image(systemName: tile.item.placeholderSymbol)
+                                .font(.system(size: compact ? 28 : 40, weight: .ultraLight))
+                                .foregroundStyle(AppColor.outline)
+                        }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            LinearGradient(
+                colors: [
+                    .black.opacity(0.04),
+                    .black.opacity(0.18),
+                    .black.opacity(0.66),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(tile.title)
+                    .appFont(compact ? .labelLg : .headlineMd)
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+
+                Text(tile.note)
+                    .appFont(.bodySm)
+                    .foregroundStyle(.white.opacity(0.92))
+                    .lineLimit(compact ? 3 : 4)
+            }
+            .padding(compact ? Spacing.stackMd : Spacing.stackLg)
+        }
+        .clipped()
         .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
+        .ambientShadow(blur: 30, y: 10, opacity: 0.05)
     }
 }
 
