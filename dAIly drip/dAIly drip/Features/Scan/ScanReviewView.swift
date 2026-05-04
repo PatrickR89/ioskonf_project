@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ScanReviewView: View {
     @State private var viewModel = ScanReviewViewModel()
-
+    @EnvironmentObject private var closetRepository: ClosetRepository
     private let suggestions = ["White Turtleneck", "Dark Wash Denim"]
 
     var body: some View {
@@ -161,7 +161,10 @@ struct ScanReviewView: View {
             PrimaryButton(
                 title: "Save to Closet",
                 leadingSystemImage: "tray.and.arrow.down.fill"
-            ) {}
+            ) {
+                let item = viewModel.makeClosetItem(ownerId: closetRepository.userProfile.id)
+                closetRepository.addClosetItem(item)
+            }
         }
         .padding(.horizontal, Spacing.containerMargin)
         .padding(.top, Spacing.stackLg)
@@ -183,4 +186,5 @@ struct ScanReviewView: View {
 
 #Preview {
     ScanReviewView()
+        .environmentObject(ClosetRepository())
 }

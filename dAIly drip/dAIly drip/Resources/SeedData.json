@@ -1,0 +1,185 @@
+{
+  "userProfile" : {
+    "id" : "seed-user",
+    "rawDescription" : "I like refined wardrobe staples: relaxed tailoring, soft knits, linen trousers, clean denim, and simple leather shoes. My default mood is polished but comfortable, with texture doing most of the work.",
+    "age" : 32,
+    "gender" : "female",
+    "preferredStyles" : [
+      "Minimalist",
+      "Tailored",
+      "Soft Classic"
+    ],
+    "preferredColors" : [
+      "Ivory",
+      "Navy",
+      "Camel",
+      "Black"
+    ],
+    "vibe" : "Polished ease",
+    "updatedAt" : "2026-05-04T10:00:00Z"
+  },
+  "closetItems" : [
+    {
+      "id" : "seed-white-shirt",
+      "ownerId" : "seed-user",
+      "name" : "Embroidered White Shirt",
+      "type" : "tops",
+      "seasons" : [
+        "spring",
+        "summer",
+        "autumn"
+      ],
+      "occasions" : [
+        "casual",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "White",
+        "hex" : "#ffffff"
+      },
+      "materials" : [
+        "Cotton"
+      ],
+      "imagePath" : "closet_white_shirt",
+      "createdAt" : "2026-05-04T10:05:00Z"
+    },
+    {
+      "id" : "seed-knit",
+      "ownerId" : "seed-user",
+      "name" : "Navy Cashmere Knit",
+      "type" : "tops",
+      "seasons" : [
+        "autumn",
+        "winter"
+      ],
+      "occasions" : [
+        "casual",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "Navy",
+        "hex" : "#1f2a44"
+      },
+      "materials" : [
+        "Cashmere"
+      ],
+      "imagePath" : "closet_cashmere_knit",
+      "createdAt" : "2026-05-04T10:06:00Z"
+    },
+    {
+      "id" : "seed-trench",
+      "ownerId" : "seed-user",
+      "name" : "Camel Trench Coat",
+      "type" : "outerwear",
+      "seasons" : [
+        "spring",
+        "autumn"
+      ],
+      "occasions" : [
+        "casual",
+        "business",
+        "formal"
+      ],
+      "primaryColor" : {
+        "name" : "Camel",
+        "hex" : "#B98D5A"
+      },
+      "materials" : [
+        "Cotton Gabardine"
+      ],
+      "imagePath" : "closet_trench_coat",
+      "createdAt" : "2026-05-04T10:07:00Z"
+    },
+    {
+      "id" : "seed-linen-trousers",
+      "ownerId" : "seed-user",
+      "name" : "Linen Trousers",
+      "type" : "bottoms",
+      "seasons" : [
+        "spring",
+        "summer"
+      ],
+      "occasions" : [
+        "casual",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "Khaki",
+        "hex" : "#D7C6A3"
+      },
+      "materials" : [
+        "Linen"
+      ],
+      "imagePath" : "closet_linen_trousers",
+      "createdAt" : "2026-05-04T10:08:00Z"
+    },
+    {
+      "id" : "seed-denim",
+      "ownerId" : "seed-user",
+      "name" : "Straight Leg Denim",
+      "type" : "bottoms",
+      "seasons" : [
+        "spring",
+        "autumn",
+        "winter"
+      ],
+      "occasions" : [
+        "casual"
+      ],
+      "primaryColor" : {
+        "name" : "Blue",
+        "hex" : "#3b4d6b"
+      },
+      "materials" : [
+        "Denim"
+      ],
+      "imagePath" : "closet_wide_denim",
+      "createdAt" : "2026-05-04T10:09:00Z"
+    },
+    {
+      "id" : "seed-loafers",
+      "ownerId" : "seed-user",
+      "name" : "Black Leather Loafers",
+      "type" : "shoes",
+      "seasons" : [
+        "spring",
+        "autumn"
+      ],
+      "occasions" : [
+        "casual",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "Black",
+        "hex" : "#111111"
+      },
+      "materials" : [
+        "Leather"
+      ],
+      "imagePath" : "closet_leather_loafers",
+      "createdAt" : "2026-05-04T10:10:00Z"
+    },
+    {
+      "id" : "seed-slip-dress",
+      "ownerId" : "seed-user",
+      "name" : "Champagne Slip Dress",
+      "type" : "dress",
+      "seasons" : [
+        "summer"
+      ],
+      "occasions" : [
+        "evening",
+        "formal"
+      ],
+      "primaryColor" : {
+        "name" : "Champagne",
+        "hex" : "#c5a059"
+      },
+      "materials" : [
+        "Satin"
+      ],
+      "imagePath" : "closet_slip_dress",
+      "createdAt" : "2026-05-04T10:11:00Z"
+    }
+  ]
+}

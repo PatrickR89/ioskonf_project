@@ -72,10 +72,6 @@ struct ColorEditorView: View {
             ordered.append(color)
         }
 
-        for item in SampleData.closet where seen.insert(item.primaryColor.hex.lowercased()).inserted {
-            ordered.append(item.primaryColor)
-        }
-
         return ordered
     }
 

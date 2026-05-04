@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct ClosetView: View {
-    @State private var selectedFilter: ItemType = .tops
+    @EnvironmentObject private var closetRepository: ClosetRepository
+    @State private var selectedFilter: ItemType? = nil
     @State private var showAddSheet = false
-
-    private let items = SampleData.closet
 
     private let columns = [
         GridItem(.flexible(), spacing: Spacing.gutter),
@@ -57,12 +56,32 @@ struct ClosetView: View {
 
     private var filterRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Spacing.stackLg / 2 * 1.5) { // 24
+            HStack(spacing: Spacing.stackLg / 2 * 1.5) {
+                allFilterTab
                 ForEach(ItemType.allCases) { type in
                     filterTab(type)
                 }
             }
         }
+    }
+
+    private var allFilterTab: some View {
+        let isSelected = selectedFilter == nil
+        return Button {
+            selectedFilter = nil
+        } label: {
+            VStack(spacing: 6) {
+                Text("All")
+                    .appFont(.labelLg)
+                    .foregroundStyle(isSelected ? AppColor.primary : AppColor.secondary)
+                Rectangle()
+                    .fill(isSelected ? AppColor.primary : .clear)
+                    .frame(height: 2)
+            }
+            .fixedSize()
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private func filterTab(_ type: ItemType) -> some View {
@@ -85,7 +104,8 @@ struct ClosetView: View {
     }
 
     private var filtered: [ClosetItem] {
-        items.filter { $0.type == selectedFilter }
+        guard let filter = selectedFilter else { return closetRepository.closetItems }
+        return closetRepository.closetItems.filter { $0.type == filter }
     }
 
     @ViewBuilder
@@ -98,6 +118,7 @@ struct ClosetView: View {
                     ItemCard(
                         name: item.name,
                         tags: tags(for: item),
+                        imageName: item.imagePath,
                         placeholderSymbol: item.placeholderSymbol,
                         placeholderTint: AppColor.outline
                     )
@@ -121,7 +142,7 @@ struct ClosetView: View {
             Text("Nothing here yet")
                 .appFont(.headlineMd)
                 .foregroundStyle(AppColor.onSurface)
-            Text("Tap the plus button to add your first \(selectedFilter.displayName.lowercased()) item.")
+            Text("Tap the plus button to add your first \(selectedFilter?.displayName.lowercased() ?? "closet") item.")
                 .appFont(.bodyMd)
                 .foregroundStyle(AppColor.secondary)
                 .multilineTextAlignment(.center)
@@ -149,4 +170,5 @@ struct ClosetView: View {
 
 #Preview {
     ClosetView()
+        .environmentObject(ClosetRepository())
 }

@@ -70,6 +70,26 @@ final class ScanReviewViewModel {
         endEdit()
     }
 
+    /// Builds a `ClosetItem` from the current draft attributes. `ownerId` and
+    /// `imagePath` are supplied by the caller because they live outside this
+    /// view model's responsibility (auth + storage layers).
+    func makeClosetItem(ownerId: String, imagePath: String? = nil) -> ClosetItem {
+        let suggestedName = "\(draftColor.name) \(draftType.displayName)"
+            .trimmingCharacters(in: .whitespaces)
+        return ClosetItem(
+            id: UUID().uuidString,
+            ownerId: ownerId,
+            name: suggestedName,
+            type: draftType,
+            seasons: draftSeasons,
+            occasions: draftOccasions,
+            primaryColor: draftColor,
+            materials: [],
+            imagePath: imagePath,
+            createdAt: .now
+        )
+    }
+
     func handlePickerSelection(_ item: PhotosPickerItem?) {
         guard let item else { return }
         loadTask?.cancel()

@@ -1,20 +1,18 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var description: String = ""
+    @State private var isExtractingProfile = false
+    @State private var extractionError: String?
+
+    private let profileExtractionService = ProfileExtractionService()
 
     private struct ExtractedTrait: Identifiable {
         let id = UUID()
         let label: String
         let value: String
     }
-
-    private let traits: [ExtractedTrait] = [
-        .init(label: "Gender:", value: "Female"),
-        .init(label: "Style:", value: "Minimalist"),
-        .init(label: "Colors:", value: "Earth Tones"),
-        .init(label: "Vibe:", value: "Sophisticated"),
-    ]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,9 +28,14 @@ struct ProfileView: View {
                     )
                     extraction
                     PrimaryButton(
-                        title: "Build My Profile",
-                        trailingSystemImage: "arrow.right"
-                    ) {}
+                        title: isExtractingProfile ? "Building Profile" : "Build My Profile",
+                        trailingSystemImage: isExtractingProfile ? nil : "arrow.right",
+                        leadingSystemImage: isExtractingProfile ? "sparkles" : nil
+                    ) {
+                        buildProfile()
+                    }
+                    .disabled(isExtractingProfile || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .opacity(isExtractingProfile ? 0.75 : 1)
                     moodboard
                 }
                 .padding(.horizontal, Spacing.containerMargin)
@@ -41,6 +44,17 @@ struct ProfileView: View {
             }
         }
         .background(AppColor.background)
+        .onAppear {
+            description = closetRepository.userProfile.rawDescription
+        }
+        .onChange(of: closetRepository.userProfile.rawDescription) { _, newValue in
+            description = newValue
+        }
+        .alert("Profile Extraction Failed", isPresented: extractionErrorBinding) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(extractionError ?? "Try again with a little more detail.")
+        }
     }
 
     private var hero: some View {
@@ -75,13 +89,100 @@ struct ProfileView: View {
                     .appFont(.labelLg)
                     .foregroundStyle(AppColor.secondary)
             }
-            FlowLayout(spacing: Spacing.gutter, lineSpacing: Spacing.gutter) {
-                ForEach(traits) { trait in
-                    Chip(text: trait.value, leading: trait.label)
+            FlowLayout(spacing: Spacing.gutter) {
+                if traits.isEmpty {
+                    Text("Profile details will appear here after extraction.")
+                        .appFont(.bodyMd)
+                        .foregroundStyle(AppColor.secondary)
+                } else {
+                    ForEach(traits) { trait in
+                        Chip(text: trait.value, leading: trait.label)
+                    }
+                }
+            }
+
+            if isExtractingProfile {
+                HStack(spacing: Spacing.stackSm) {
+                    ProgressView()
+                    Text("Reading style description")
+                        .appFont(.labelMd)
+                        .foregroundStyle(AppColor.secondary)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var extractionErrorBinding: Binding<Bool> {
+        Binding {
+            extractionError != nil
+        } set: { isPresented in
+            if !isPresented {
+                extractionError = nil
+            }
+        }
+    }
+
+    private var traits: [ExtractedTrait] {
+        let profile = closetRepository.userProfile
+        var extractedTraits: [ExtractedTrait] = []
+
+        if let age = profile.age {
+            extractedTraits.append(.init(label: "Age:", value: String(age)))
+        }
+
+        if let gender = profile.gender {
+            extractedTraits.append(.init(label: "Gender:", value: gender.displayName))
+        }
+
+        if !profile.preferredStyles.isEmpty {
+            extractedTraits.append(.init(label: "Styles:", value: profile.preferredStyles.joined(separator: ", ")))
+        }
+
+        if !profile.preferredColors.isEmpty {
+            extractedTraits.append(.init(label: "Colors:", value: profile.preferredColors.joined(separator: ", ")))
+        }
+
+        if let vibe = profile.vibe {
+            extractedTraits.append(.init(label: "Vibe:", value: vibe))
+        }
+
+        return extractedTraits
+    }
+
+    private func buildProfile() {
+        let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedDescription.isEmpty, !isExtractingProfile else {
+            return
+        }
+
+        isExtractingProfile = true
+        extractionError = nil
+
+        Task {
+            do {
+                let profile = try await profileExtractionService.extractProfile(
+                    from: trimmedDescription,
+                    currentProfile: closetRepository.userProfile
+                )
+                closetRepository.updateUserProfile(profile)
+                description = profile.rawDescription
+            } catch {
+                BackendLogger.error(
+                    "Profile extraction failed in UI flow; preserving raw description",
+                    error: error,
+                    metadata: [
+                        "descriptionCharacters": trimmedDescription.count,
+                        "descriptionPreview": BackendLogger.preview(trimmedDescription),
+                    ]
+                )
+                var profile = closetRepository.userProfile
+                profile.rawDescription = trimmedDescription
+                closetRepository.updateUserProfile(profile)
+                extractionError = error.localizedDescription
+            }
+            isExtractingProfile = false
+        }
     }
 
     private var moodboard: some View {
@@ -116,4 +217,5 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
+        .environmentObject(ClosetRepository())
 }

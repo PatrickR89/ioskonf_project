@@ -7,6 +7,8 @@ struct BentoOutfitCard: View {
     let title: String
     let heroSymbol: String
     let detailSymbols: [String]
+    var heroImageName: String?
+    var detailImageNames: [String] = []
     var heroOnLeft: Bool = true
     var onWearThis: () -> Void = {}
 
@@ -60,28 +62,42 @@ struct BentoOutfitCard: View {
     }
 
     private var hero: some View {
-        placeholder(heroSymbol)
+        thumbnail(imageName: heroImageName, symbol: heroSymbol)
             .aspectRatio(3.0/4.0, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: Radius.standard))
     }
 
     private var detailColumn: some View {
         VStack(spacing: 12) {
-            ForEach(Array(detailSymbols.prefix(2).enumerated()), id: \.offset) { _, symbol in
-                placeholder(symbol)
+            ForEach(Array(detailSymbols.prefix(2).enumerated()), id: \.offset) { index, symbol in
+                thumbnail(imageName: detailImageNames[safe: index], symbol: symbol)
                     .aspectRatio(1, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: Radius.standard))
             }
         }
     }
 
-    private func placeholder(_ symbol: String) -> some View {
+    private func thumbnail(imageName: String?, symbol: String) -> some View {
         ZStack {
             AppColor.surfaceContainer
-            Image(systemName: symbol)
-                .font(.system(size: 36, weight: .ultraLight))
-                .foregroundStyle(AppColor.outline)
+            if let imageName {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: symbol)
+                    .font(.system(size: 36, weight: .ultraLight))
+                    .foregroundStyle(AppColor.outline)
+            }
         }
+        .clipped()
+    }
+
+}
+
+private extension Array {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
 

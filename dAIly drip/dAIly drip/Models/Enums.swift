@@ -2,6 +2,15 @@ import Foundation
 
 enum Gender: String, Codable, CaseIterable, Sendable {
     case female, male, nonBinary, preferNotToSay
+
+    var displayName: String {
+        switch self {
+        case .female:         return "Female"
+        case .male:           return "Male"
+        case .nonBinary:      return "Non-binary"
+        case .preferNotToSay: return "Prefer not to say"
+        }
+    }
 }
 
 enum ItemType: String, Codable, CaseIterable, Identifiable, Sendable {
