@@ -5,6 +5,7 @@ import Foundation
 final class ClosetRepository: ObservableObject {
     @Published private(set) var closetItems: [ClosetItem]
     @Published private(set) var userProfile: UserProfile
+    @Published private(set) var generatedOutfits: [Outfit]
 
     private let store: ClosetLocalStoring
     private let seedSnapshot: ClosetRepositorySnapshot
@@ -19,9 +20,11 @@ final class ClosetRepository: ObservableObject {
         if let snapshot = store.load() {
             closetItems = snapshot.closetItems
             userProfile = snapshot.userProfile
+            generatedOutfits = snapshot.generatedOutfits
         } else {
             closetItems = seedSnapshot.closetItems
             userProfile = seedSnapshot.userProfile
+            generatedOutfits = seedSnapshot.generatedOutfits
             persist()
         }
     }
@@ -57,9 +60,20 @@ final class ClosetRepository: ObservableObject {
         persist()
     }
 
+    func updateGeneratedOutfits(_ outfits: [Outfit]) {
+        generatedOutfits = outfits
+        persist()
+    }
+
+    func clearGeneratedOutfits() {
+        generatedOutfits = []
+        persist()
+    }
+
     func resetToSeedData() {
         closetItems = seedSnapshot.closetItems
         userProfile = seedSnapshot.userProfile
+        generatedOutfits = seedSnapshot.generatedOutfits
         persist()
     }
 
@@ -67,7 +81,8 @@ final class ClosetRepository: ObservableObject {
         store.save(
             ClosetRepositorySnapshot(
                 closetItems: closetItems,
-                userProfile: userProfile
+                userProfile: userProfile,
+                generatedOutfits: generatedOutfits
             )
         )
     }
@@ -76,6 +91,30 @@ final class ClosetRepository: ObservableObject {
 struct ClosetRepositorySnapshot: Codable, Sendable {
     var closetItems: [ClosetItem]
     var userProfile: UserProfile
+    var generatedOutfits: [Outfit]
+
+    init(
+        closetItems: [ClosetItem],
+        userProfile: UserProfile,
+        generatedOutfits: [Outfit] = []
+    ) {
+        self.closetItems = closetItems
+        self.userProfile = userProfile
+        self.generatedOutfits = generatedOutfits
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case closetItems
+        case userProfile
+        case generatedOutfits
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        closetItems = try container.decode([ClosetItem].self, forKey: .closetItems)
+        userProfile = try container.decode(UserProfile.self, forKey: .userProfile)
+        generatedOutfits = try container.decodeIfPresent([Outfit].self, forKey: .generatedOutfits) ?? []
+    }
 }
 
 protocol ClosetLocalStoring {
