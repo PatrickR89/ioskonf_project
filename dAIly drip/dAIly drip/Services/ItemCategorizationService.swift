@@ -48,7 +48,7 @@ struct ItemCategorizationService: Sendable {
             modelName: Self.modelName,
             generationConfig: GenerationConfig(
                 temperature: 0.2,
-                maxOutputTokens: 256,
+                maxOutputTokens: 2500,
                 responseMIMEType: "application/json",
                 responseSchema: Self.responseSchema
             ),
