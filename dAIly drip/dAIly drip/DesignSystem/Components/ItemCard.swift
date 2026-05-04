@@ -25,7 +25,7 @@ struct ItemCard: View {
                         .foregroundStyle(placeholderTint)
                 }
             }
-            .aspectRatio(3.0/4.0, contentMode: .fill)
+            .aspectRatio(3.0/4.0, contentMode: .fit)
             .clipped()
 
             VStack(alignment: .leading, spacing: Spacing.stackSm) {
