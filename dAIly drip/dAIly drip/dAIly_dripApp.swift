@@ -5,6 +5,7 @@
 //  Created by Patrick Ružman on 04.05.2026..
 //
 
+import RevenueCat
 import FirebaseCore
 import SwiftUI
 
@@ -21,6 +22,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 "apiKeySuffix": FirebaseApp.app()?.options.apiKey.map { String($0.suffix(6)) },
             ]
         )
+        
+        Purchases.configure(withAPIKey: "test_qiYyviaXIRsKShsKgwLLDBdEErl")
         
         return true
     }

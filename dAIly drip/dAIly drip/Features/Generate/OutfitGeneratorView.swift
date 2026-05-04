@@ -1,3 +1,5 @@
+import RevenueCat
+import RevenueCatUI
 import SwiftUI
 
 struct OutfitGeneratorView: View {
@@ -6,6 +8,7 @@ struct OutfitGeneratorView: View {
     @State private var selectedQuickPrompt: String? = "Chic Dinner Date"
     @State private var isGenerating = false
     @State private var generationError: String?
+    @State private var displayPaywall = false
 
     private let outfitGenerationService = OutfitGenerationService()
     private let quickPrompts = SampleData.occasionPrompts
@@ -90,10 +93,17 @@ struct OutfitGeneratorView: View {
                 trailingSystemImage: isGenerating ? nil : "sparkles",
                 leadingSystemImage: isGenerating ? "sparkles" : nil
             ) {
-                generate()
+                displayPaywall = true
             }
             .disabled(isGenerating || resolvedPrompt.isEmpty)
             .opacity(isGenerating ? 0.75 : 1)
+        }
+        .sheet(isPresented: self.$displayPaywall) {
+            // We handle scroll views for you, no need to wrap this in a ScrollView
+            PaywallView()
+                .onPurchaseCompleted { _ in
+                    generate()
+                }
         }
     }
 

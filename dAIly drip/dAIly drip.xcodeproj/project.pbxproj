@@ -13,6 +13,8 @@
 		C2D367742FA8B4390038A85F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367732FA8B4390038A85F /* FirebaseCore */; };
 		C2D367762FA8B4390038A85F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367752FA8B4390038A85F /* FirebaseFirestore */; };
 		C2D367782FA8B4390038A85F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C2D367772FA8B4390038A85F /* FirebaseStorage */; };
+		C2D3699D2FA8DC590038A85F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = C2D3699C2FA8DC590038A85F /* RevenueCat */; };
+		C2D3699F2FA8DC590038A85F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = C2D3699E2FA8DC590038A85F /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +66,8 @@
 			files = (
 				C2D367722FA8B4390038A85F /* FirebaseAILogic in Frameworks */,
 				C2D367762FA8B4390038A85F /* FirebaseFirestore in Frameworks */,
+				C2D3699F2FA8DC590038A85F /* RevenueCatUI in Frameworks */,
+				C2D3699D2FA8DC590038A85F /* RevenueCat in Frameworks */,
 				C2D367742FA8B4390038A85F /* FirebaseCore in Frameworks */,
 				C2D367782FA8B4390038A85F /* FirebaseStorage in Frameworks */,
 				C2D367702FA8B4390038A85F /* FirebaseAI in Frameworks */,
@@ -133,6 +137,8 @@
 				C2D367732FA8B4390038A85F /* FirebaseCore */,
 				C2D367752FA8B4390038A85F /* FirebaseFirestore */,
 				C2D367772FA8B4390038A85F /* FirebaseStorage */,
+				C2D3699C2FA8DC590038A85F /* RevenueCat */,
+				C2D3699E2FA8DC590038A85F /* RevenueCatUI */,
 			);
 			productName = "dAIly drip";
 			productReference = CDEF936E2FA8AE840062DAF9 /* dAIly drip.app */;
@@ -218,6 +224,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C2D3699B2FA8DC590038A85F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CDEF936F2FA8AE840062DAF9 /* Products */;
@@ -617,6 +624,14 @@
 				minimumVersion = 12.12.1;
 			};
 		};
+		C2D3699B2FA8DC590038A85F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.70.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -644,6 +659,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C2D3676E2FA8B4390038A85F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		C2D3699C2FA8DC590038A85F /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3699B2FA8DC590038A85F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		C2D3699E2FA8DC590038A85F /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C2D3699B2FA8DC590038A85F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
