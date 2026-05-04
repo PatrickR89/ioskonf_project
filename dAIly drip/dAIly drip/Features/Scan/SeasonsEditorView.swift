@@ -12,11 +12,7 @@ struct SeasonsEditorView: View {
                         .foregroundStyle(AppColor.secondary)
                         .padding(.bottom, Spacing.stackSm)
 
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 110), spacing: Spacing.stackSm)],
-                        alignment: .leading,
-                        spacing: Spacing.stackSm
-                    ) {
+                    FlowLayout(spacing: Spacing.stackSm, lineSpacing: Spacing.stackSm) {
                         ForEach(Season.allCases, id: \.self) { season in
                             SelectableChip(
                                 text: season.displayName,
@@ -26,6 +22,7 @@ struct SeasonsEditorView: View {
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(Spacing.containerMargin)
             }

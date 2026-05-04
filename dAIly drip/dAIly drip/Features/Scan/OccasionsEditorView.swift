@@ -12,11 +12,7 @@ struct OccasionsEditorView: View {
                         .foregroundStyle(AppColor.secondary)
                         .padding(.bottom, Spacing.stackSm)
 
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 110), spacing: Spacing.stackSm)],
-                        alignment: .leading,
-                        spacing: Spacing.stackSm
-                    ) {
+                    FlowLayout(spacing: Spacing.stackSm, lineSpacing: Spacing.stackSm) {
                         ForEach(Occasion.allCases, id: \.self) { occasion in
                             SelectableChip(
                                 text: occasion.displayName,
@@ -26,6 +22,7 @@ struct OccasionsEditorView: View {
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(Spacing.containerMargin)
             }

@@ -6,11 +6,7 @@ struct TypeEditorView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 110), spacing: Spacing.stackSm)],
-                    alignment: .leading,
-                    spacing: Spacing.stackSm
-                ) {
+                FlowLayout(spacing: Spacing.stackSm, lineSpacing: Spacing.stackSm) {
                     ForEach(ItemType.allCases) { type in
                         SelectableChip(
                             text: type.displayName,
@@ -20,6 +16,7 @@ struct TypeEditorView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Spacing.containerMargin)
             }
             .background(AppColor.background)
