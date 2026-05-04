@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ScanReviewView: View {
+    @EnvironmentObject private var closetRepository: ClosetRepository
     private let item = SampleData.scanCandidate
     private let suggestions = ["White Turtleneck", "Dark Wash Denim"]
 
@@ -91,7 +92,9 @@ struct ScanReviewView: View {
             PrimaryButton(
                 title: "Save to Closet",
                 leadingSystemImage: "tray.and.arrow.down.fill"
-            ) {}
+            ) {
+                closetRepository.addClosetItem(item)
+            }
         }
         .padding(.horizontal, Spacing.containerMargin)
         .padding(.top, Spacing.stackLg)
@@ -113,4 +116,5 @@ struct ScanReviewView: View {
 
 #Preview {
     ScanReviewView()
+        .environmentObject(ClosetRepository())
 }
