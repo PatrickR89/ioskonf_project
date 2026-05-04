@@ -47,11 +47,33 @@ final class ClosetRepository: ObservableObject {
     func addClosetItem(_ item: ClosetItem) {
         if let index = closetItems.firstIndex(where: { $0.id == item.id }) {
             closetItems[index] = item
+            BackendLogger.info(
+                "Updated existing closet item",
+                metadata: [
+                    "id": item.id,
+                    "type": item.type.rawValue,
+                    "color": item.primaryColor.name,
+                    "hasImagePath": item.imagePath != nil,
+                    "totalItemCount": closetItems.count,
+                ]
+            )
             persist()
             return
         }
 
         closetItems.insert(item, at: 0)
+        BackendLogger.info(
+            "Inserted new closet item",
+            metadata: [
+                "id": item.id,
+                "type": item.type.rawValue,
+                "color": item.primaryColor.name,
+                "seasonCount": item.seasons.count,
+                "occasionCount": item.occasions.count,
+                "hasImagePath": item.imagePath != nil,
+                "totalItemCount": closetItems.count,
+            ]
+        )
         persist()
     }
 

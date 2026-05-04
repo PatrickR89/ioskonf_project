@@ -205,9 +205,13 @@ struct ScanReviewView: View {
                 title: "Save to Closet",
                 leadingSystemImage: "tray.and.arrow.down.fill"
             ) {
-                let item = viewModel.makeClosetItem(ownerId: closetRepository.userProfile.id)
+                let item = viewModel.buildItemForSave(
+                    ownerId: closetRepository.userProfile.id
+                )
                 closetRepository.addClosetItem(item)
+                viewModel.resetAfterSave()
             }
+            .disabled(viewModel.selectedImage == nil || viewModel.isAnalyzingImage)
         }
         .padding(.horizontal, Spacing.containerMargin)
         .padding(.top, Spacing.stackLg)
