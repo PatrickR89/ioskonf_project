@@ -1,0 +1,152 @@
+import SwiftUI
+
+struct ClosetView: View {
+    @State private var selectedFilter: ItemType = .tops
+    @State private var showAddSheet = false
+
+    private let items = SampleData.closet
+
+    private let columns = [
+        GridItem(.flexible(), spacing: Spacing.gutter),
+        GridItem(.flexible(), spacing: Spacing.gutter),
+    ]
+
+    var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            VStack(spacing: 0) {
+                StyleAITopBar(leadingTinted: true, trailingTinted: true)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: Spacing.stackLg) {
+                        header
+                        filterRow
+                        grid
+                    }
+                    .padding(.horizontal, Spacing.containerMargin)
+                    .padding(.top, Spacing.stackLg)
+                    .padding(.bottom, Spacing.stackXl + Spacing.stackLg)
+                }
+            }
+
+            fab
+                .padding(.trailing, Spacing.containerMargin)
+                .padding(.bottom, Spacing.stackLg)
+        }
+        .background(AppColor.background)
+        .confirmationDialog(
+            "Add an item",
+            isPresented: $showAddSheet,
+            titleVisibility: .visible
+        ) {
+            Button("Take Photo") {}
+            Button("Choose from Library") {}
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Spacing.stackSm) {
+            Text("My Closet")
+                .appFont(.displayMd)
+                .foregroundStyle(AppColor.onSurface)
+            Text("A curated collection of your essentials.")
+                .appFont(.bodyMd)
+                .foregroundStyle(AppColor.secondary)
+        }
+    }
+
+    private var filterRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: Spacing.stackLg / 2 * 1.5) { // 24
+                ForEach(ItemType.allCases) { type in
+                    filterTab(type)
+                }
+            }
+        }
+    }
+
+    private func filterTab(_ type: ItemType) -> some View {
+        let isSelected = selectedFilter == type
+        return Button {
+            selectedFilter = type
+        } label: {
+            VStack(spacing: 6) {
+                Text(type.displayName)
+                    .appFont(.labelLg)
+                    .foregroundStyle(isSelected ? AppColor.primary : AppColor.secondary)
+                Rectangle()
+                    .fill(isSelected ? AppColor.primary : .clear)
+                    .frame(height: 2)
+            }
+            .fixedSize()
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var filtered: [ClosetItem] {
+        items.filter { $0.type == selectedFilter }
+    }
+
+    @ViewBuilder
+    private var grid: some View {
+        if filtered.isEmpty {
+            emptyState
+        } else {
+            LazyVGrid(columns: columns, spacing: Spacing.gutter) {
+                ForEach(filtered) { item in
+                    ItemCard(
+                        name: item.name,
+                        tags: tags(for: item),
+                        placeholderSymbol: item.placeholderSymbol,
+                        placeholderTint: AppColor.outline
+                    )
+                }
+            }
+        }
+    }
+
+    private func tags(for item: ClosetItem) -> [String] {
+        var t: [String] = []
+        if let material = item.materials.first { t.append(material) }
+        t.append(item.primaryColor.name)
+        return t
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: Spacing.stackMd) {
+            Image(systemName: "tshirt")
+                .font(.system(size: 48, weight: .ultraLight))
+                .foregroundStyle(AppColor.outlineVariant)
+            Text("Nothing here yet")
+                .appFont(.headlineMd)
+                .foregroundStyle(AppColor.onSurface)
+            Text("Tap the plus button to add your first \(selectedFilter.displayName.lowercased()) item.")
+                .appFont(.bodyMd)
+                .foregroundStyle(AppColor.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Spacing.stackXl)
+    }
+
+    private var fab: some View {
+        Button {
+            showAddSheet = true
+        } label: {
+            Label("Add item", systemImage: "plus")
+                .labelStyle(.iconOnly)
+                .font(.system(size: 28, weight: .regular))
+                .frame(width: 56, height: 56)
+                .foregroundStyle(AppColor.onPrimary)
+                .background(AppColor.primary, in: Circle())
+                .ambientShadow(blur: 24, y: 6, opacity: 0.18)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel("Add item to closet")
+    }
+}
+
+#Preview {
+    ClosetView()
+}

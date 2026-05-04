@@ -11,7 +11,7 @@ import SwiftUI
 struct dAIly_dripApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
