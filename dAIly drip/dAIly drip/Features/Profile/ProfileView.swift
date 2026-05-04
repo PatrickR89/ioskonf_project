@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var description: String = ""
 
     private struct ExtractedTrait: Identifiable {
@@ -8,13 +9,6 @@ struct ProfileView: View {
         let label: String
         let value: String
     }
-
-    private let traits: [ExtractedTrait] = [
-        .init(label: "Gender:", value: "Female"),
-        .init(label: "Style:", value: "Minimalist"),
-        .init(label: "Colors:", value: "Earth Tones"),
-        .init(label: "Vibe:", value: "Sophisticated"),
-    ]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,7 +26,9 @@ struct ProfileView: View {
                     PrimaryButton(
                         title: "Build My Profile",
                         trailingSystemImage: "arrow.right"
-                    ) {}
+                    ) {
+                        saveProfile()
+                    }
                     moodboard
                 }
                 .padding(.horizontal, Spacing.containerMargin)
@@ -41,6 +37,12 @@ struct ProfileView: View {
             }
         }
         .background(AppColor.background)
+        .onAppear {
+            description = closetRepository.userProfile.rawDescription
+        }
+        .onChange(of: closetRepository.userProfile.rawDescription) { _, newValue in
+            description = newValue
+        }
     }
 
     private var hero: some View {
@@ -82,6 +84,35 @@ struct ProfileView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var traits: [ExtractedTrait] {
+        let profile = closetRepository.userProfile
+        var extractedTraits: [ExtractedTrait] = []
+
+        if let gender = profile.gender {
+            extractedTraits.append(.init(label: "Gender:", value: gender.displayName))
+        }
+
+        if let style = profile.preferredStyles.first {
+            extractedTraits.append(.init(label: "Style:", value: style))
+        }
+
+        if let colors = profile.preferredColors.first {
+            extractedTraits.append(.init(label: "Colors:", value: colors))
+        }
+
+        if let vibe = profile.vibe {
+            extractedTraits.append(.init(label: "Vibe:", value: vibe))
+        }
+
+        return extractedTraits
+    }
+
+    private func saveProfile() {
+        var profile = closetRepository.userProfile
+        profile.rawDescription = description
+        closetRepository.updateUserProfile(profile)
     }
 
     private var moodboard: some View {
@@ -156,4 +187,5 @@ struct FlowLayout: Layout {
 
 #Preview {
     ProfileView()
+        .environmentObject(ClosetRepository())
 }

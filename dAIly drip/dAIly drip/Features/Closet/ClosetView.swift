@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct ClosetView: View {
+    @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var selectedFilter: ItemType = .tops
     @State private var showAddSheet = false
-
-    private let items = SampleData.closet
 
     private let columns = [
         GridItem(.flexible(), spacing: Spacing.gutter),
@@ -85,7 +84,7 @@ struct ClosetView: View {
     }
 
     private var filtered: [ClosetItem] {
-        items.filter { $0.type == selectedFilter }
+        closetRepository.closetItems.filter { $0.type == selectedFilter }
     }
 
     @ViewBuilder
@@ -149,4 +148,5 @@ struct ClosetView: View {
 
 #Preview {
     ClosetView()
+        .environmentObject(ClosetRepository())
 }

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct OutfitGeneratorView: View {
+    @EnvironmentObject private var closetRepository: ClosetRepository
     @State private var prompt: String = ""
     @State private var selectedQuickPrompt: String? = "Chic Dinner Date"
 
@@ -114,7 +115,7 @@ struct OutfitGeneratorView: View {
     }
 
     private func heroSymbol(for outfit: Outfit) -> String {
-        guard let item = SampleData.closet.first(where: { outfit.itemIds.contains($0.id) }) else {
+        guard let item = closetRepository.closetItems.first(where: { outfit.itemIds.contains($0.id) }) else {
             return "tshirt"
         }
         return item.placeholderSymbol
@@ -122,7 +123,7 @@ struct OutfitGeneratorView: View {
 
     private func detailSymbols(for outfit: Outfit) -> [String] {
         let items = outfit.itemIds.compactMap { id in
-            SampleData.closet.first(where: { $0.id == id })
+            closetRepository.closetItems.first(where: { $0.id == id })
         }
         return Array(items.dropFirst().prefix(2)).map { $0.placeholderSymbol }
     }
@@ -130,4 +131,5 @@ struct OutfitGeneratorView: View {
 
 #Preview {
     OutfitGeneratorView()
+        .environmentObject(ClosetRepository())
 }

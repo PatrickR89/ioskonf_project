@@ -39,4 +39,5 @@ struct RootView: View {
 
 #Preview {
     RootView()
+        .environmentObject(ClosetRepository())
 }

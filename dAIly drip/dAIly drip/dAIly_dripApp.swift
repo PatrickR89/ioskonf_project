@@ -21,10 +21,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct dAIly_dripApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var closetRepository = ClosetRepository()
     
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(closetRepository)
         }
     }
 }
