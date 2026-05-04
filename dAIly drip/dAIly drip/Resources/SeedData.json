@@ -180,6 +180,122 @@
       ],
       "imagePath" : "closet_slip_dress",
       "createdAt" : "2026-05-04T10:11:00Z"
+    },
+    {
+      "id" : "seed-leather-jacket",
+      "ownerId" : "seed-user",
+      "name" : "Black Leather Jacket",
+      "type" : "outerwear",
+      "seasons" : [
+        "spring",
+        "autumn"
+      ],
+      "occasions" : [
+        "casual",
+        "evening"
+      ],
+      "primaryColor" : {
+        "name" : "Black",
+        "hex" : "#111111"
+      },
+      "materials" : [
+        "Leather"
+      ],
+      "imagePath" : "closet_leather_jacket",
+      "createdAt" : "2026-05-04T10:12:00Z"
+    },
+    {
+      "id" : "seed-sneakers",
+      "ownerId" : "seed-user",
+      "name" : "Relaxed White Sneakers",
+      "type" : "shoes",
+      "seasons" : [
+        "spring",
+        "summer",
+        "autumn"
+      ],
+      "occasions" : [
+        "casual"
+      ],
+      "primaryColor" : {
+        "name" : "White",
+        "hex" : "#f5f5f5"
+      },
+      "materials" : [
+        "Canvas"
+      ],
+      "imagePath" : "closet_sneakers",
+      "createdAt" : "2026-05-04T10:13:00Z"
+    },
+    {
+      "id" : "seed-high-heels",
+      "ownerId" : "seed-user",
+      "name" : "Black High Heels",
+      "type" : "shoes",
+      "seasons" : [
+        "spring",
+        "summer",
+        "autumn"
+      ],
+      "occasions" : [
+        "formal",
+        "evening",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "Black",
+        "hex" : "#111111"
+      },
+      "materials" : [
+        "Leather"
+      ],
+      "imagePath" : "closet_high_heels",
+      "createdAt" : "2026-05-04T10:14:00Z"
+    },
+    {
+      "id" : "seed-wool-scarf",
+      "ownerId" : "seed-user",
+      "name" : "Wool Scarf",
+      "type" : "accessories",
+      "seasons" : [
+        "autumn",
+        "winter"
+      ],
+      "occasions" : [
+        "casual",
+        "business"
+      ],
+      "primaryColor" : {
+        "name" : "Cream",
+        "hex" : "#f0ebe0"
+      },
+      "materials" : [
+        "Wool"
+      ],
+      "imagePath" : "closet_wool_scarf",
+      "createdAt" : "2026-05-04T10:15:00Z"
+    },
+    {
+      "id" : "seed-parka",
+      "ownerId" : "seed-user",
+      "name" : "Dark Parka",
+      "type" : "outerwear",
+      "seasons" : [
+        "autumn",
+        "winter"
+      ],
+      "occasions" : [
+        "casual"
+      ],
+      "primaryColor" : {
+        "name" : "Olive",
+        "hex" : "#3b3d2f"
+      },
+      "materials" : [
+        "Nylon"
+      ],
+      "imagePath" : "closet_parka",
+      "createdAt" : "2026-05-04T10:16:00Z"
     }
   ]
 }

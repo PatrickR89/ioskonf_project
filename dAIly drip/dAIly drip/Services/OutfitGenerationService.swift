@@ -2,8 +2,9 @@ import FirebaseAILogic
 import Foundation
 
 struct OutfitGenerationService: Sendable {
-    private static let backendName = "Gemini Developer API"
-    private static let modelName = "gemini-2.5-flash-lite"
+    private static let backendName = "Vertex AI Gemini API"
+    private static let modelName = "gemini-2.5-flash"
+    private static let backend = Backend.vertexAI()
 
     private struct OutfitResponse: Decodable {
         var outfits: [GeneratedOutfit]
@@ -76,11 +77,11 @@ struct OutfitGenerationService: Sendable {
             ]
         )
 
-        let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
+        let model = FirebaseAI.firebaseAI(backend: Self.backend).generativeModel(
             modelName: Self.modelName,
             generationConfig: GenerationConfig(
                 temperature: 0.35,
-                maxOutputTokens: 512,
+                maxOutputTokens: 5000,
                 responseMIMEType: "application/json",
                 responseSchema: Self.responseSchema
             ),

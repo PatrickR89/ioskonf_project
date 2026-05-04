@@ -18,7 +18,7 @@ struct ItemCard: View {
                 if let imageName {
                     Image(imageName)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                 } else {
                     Image(systemName: placeholderSymbol)
                         .font(.system(size: 56, weight: .ultraLight))
