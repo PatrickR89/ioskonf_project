@@ -56,6 +56,21 @@ struct ScanReviewView: View {
             case .color:     ColorEditorView(viewModel: viewModel)
             }
         }
+        .alert("Categorization Failed", isPresented: analyzeErrorBinding) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.analyzeError ?? "Try a different photo.")
+        }
+    }
+
+    private var analyzeErrorBinding: Binding<Bool> {
+        Binding {
+            viewModel.analyzeError != nil
+        } set: { isPresented in
+            if !isPresented {
+                viewModel.analyzeError = nil
+            }
+        }
     }
 
     private var canvas: some View {
@@ -88,7 +103,7 @@ struct ScanReviewView: View {
                 .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
                 .ambientShadow(blur: 30, y: 10, opacity: 0.04)
                 .overlay(alignment: .topTrailing) {
-                    if viewModel.selectedImage != nil {
+                    if viewModel.isAnalyzingImage {
                         AIPulseIndicator(label: "AI Analysis Active")
                             .padding(Spacing.stackMd)
                     }
@@ -140,6 +155,34 @@ struct ScanReviewView: View {
                     onEdit: { viewModel.beginEdit(.color) }
                 )
             }
+            .opacity(viewModel.isAnalyzingImage ? 0.35 : 1)
+            .allowsHitTesting(!viewModel.isAnalyzingImage)
+            .overlay {
+                if viewModel.isAnalyzingImage {
+                    VStack(spacing: Spacing.stackSm) {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(AppColor.primary)
+                            .scaleEffect(1.2)
+                        Text("Analyzing your item…")
+                            .appFont(.labelMd)
+                            .foregroundStyle(AppColor.secondary)
+                    }
+                    .padding(.horizontal, Spacing.stackLg)
+                    .padding(.vertical, Spacing.stackMd)
+                    .background(
+                        AppColor.surfaceContainerLowest.opacity(0.92),
+                        in: RoundedRectangle(cornerRadius: Radius.md)
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: Radius.md)
+                            .stroke(AppColor.outlineVariant, lineWidth: 1)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Analyzing your item")
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: viewModel.isAnalyzingImage)
 
             Divider()
                 .background(AppColor.outlineVariant)

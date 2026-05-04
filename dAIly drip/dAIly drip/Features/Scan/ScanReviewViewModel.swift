@@ -22,7 +22,12 @@ final class ScanReviewViewModel {
     var draftColor: ColorTag = SampleData.scanCandidate.primaryColor
     var editingField: AttributeField?
 
+    var isAnalyzingImage = false
+    var analyzeError: String?
+
     private var loadTask: Task<Void, Never>?
+    private var analyzeTask: Task<Void, Never>?
+    private let categorizationService = ItemCategorizationService()
 
     func presentSourceDialog() {
         isSourceDialogPresented = true
@@ -101,6 +106,7 @@ final class ScanReviewViewModel {
     func setCapturedImage(_ image: UIImage) {
         selectedImage = image
         loadError = nil
+        analyze(image)
     }
 
     private func load(from item: PhotosPickerItem) async {
@@ -116,10 +122,69 @@ final class ScanReviewViewModel {
             }
             selectedImage = image
             loadError = nil
+            analyze(image)
         } catch is CancellationError {
             // Superseded by a newer selection — ignore.
         } catch {
             loadError = error.localizedDescription
+        }
+    }
+
+    private func analyze(_ image: UIImage) {
+        analyzeTask?.cancel()
+        analyzeError = nil
+
+        let resized = image.downscaled(maxEdge: 1600)
+        guard let jpeg = resized.jpegData(compressionQuality: 0.8) else {
+            analyzeError = "Could not encode the photo for analysis."
+            return
+        }
+
+        isAnalyzingImage = true
+        let service = categorizationService
+
+        analyzeTask = Task { [weak self] in
+            defer { self?.isAnalyzingImage = false }
+            do {
+                let suggestion = try await service.categorize(imageJpeg: jpeg)
+                try Task.checkCancellation()
+                self?.applySuggestion(suggestion)
+            } catch is CancellationError {
+                // A newer image was picked; ignore.
+            } catch {
+                BackendLogger.error(
+                    "Item categorization failed in scan flow",
+                    error: error,
+                    metadata: ["jpegBytes": jpeg.count]
+                )
+                self?.analyzeError = error.localizedDescription
+            }
+        }
+    }
+
+    private func applySuggestion(_ suggestion: ItemCategorizationService.Suggestion) {
+        draftType = suggestion.type
+        if !suggestion.seasons.isEmpty {
+            draftSeasons = suggestion.seasons
+        }
+        if !suggestion.occasions.isEmpty {
+            draftOccasions = suggestion.occasions
+        }
+        draftColor = suggestion.primaryColor
+    }
+}
+
+private extension UIImage {
+    func downscaled(maxEdge: CGFloat) -> UIImage {
+        let longest = max(size.width, size.height)
+        guard longest > maxEdge, longest > 0 else { return self }
+        let scale = maxEdge / longest
+        let target = CGSize(width: size.width * scale, height: size.height * scale)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let renderer = UIGraphicsImageRenderer(size: target, format: format)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: target))
         }
     }
 }
