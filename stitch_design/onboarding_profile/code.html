@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#775a19",
+                    "surface-container-high": "#e9e8e7",
+                    "surface-container-low": "#f5f3f3",
+                    "on-tertiary-container": "#3b3b38",
+                    "surface-container": "#efeded",
+                    "surface-container-highest": "#e4e2e2",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "surface": "#fbf9f9",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#d1c5b4",
+                    "on-surface-variant": "#4e4639",
+                    "primary-fixed-dim": "#e9c176",
+                    "primary": "#775a19",
+                    "secondary-fixed": "#e5e2e1",
+                    "surface-dim": "#dbdad9",
+                    "tertiary-fixed": "#e4e2dd",
+                    "on-primary-fixed-variant": "#5d4201",
+                    "surface-bright": "#fbf9f9",
+                    "tertiary-fixed-dim": "#c8c6c2",
+                    "primary-container": "#c5a059",
+                    "surface-variant": "#e4e2e2",
+                    "on-secondary-fixed-variant": "#474746",
+                    "on-primary-container": "#4e3700",
+                    "secondary": "#5f5e5e",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#1b1c19",
+                    "on-secondary-container": "#636262",
+                    "inverse-on-surface": "#f2f0f0",
+                    "tertiary": "#5e5e5b",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#e2dfde",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#e9c176",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#474744",
+                    "on-surface": "#1b1c1c",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "tertiary-container": "#a6a5a1",
+                    "on-background": "#1b1c1c",
+                    "outline": "#7f7667",
+                    "inverse-surface": "#303031",
+                    "background": "#fbf9f9",
+                    "primary-fixed": "#ffdea5",
+                    "on-primary-fixed": "#261900"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "container-margin": "24px",
+                    "stack-xl": "64px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "label-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "display-lg": ["Noto Serif"],
+                    "label-md": ["Manrope"],
+                    "headline-lg": ["Noto Serif"],
+                    "body-lg": ["Manrope"],
+                    "body-sm": ["Manrope"],
+                    "headline-md": ["Noto Serif"],
+                    "display-md": ["Noto Serif"]
+            },
+            "fontSize": {
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "display-md": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .backdrop-blur-custom {
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-fixed">
+<!-- TopAppBar -->
+<header class="bg-stone-50 dark:bg-neutral-950 docked full-width top-0 border-b border-stone-200/60 dark:border-neutral-800 flat no-shadows flex justify-between items-center w-full px-6 h-16 sticky z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-stone-400 dark:text-neutral-500 hover:opacity-70 transition-opacity cursor-pointer" data-icon="menu">menu</span>
+</div>
+<div class="font-serif italic font-medium text-2xl text-stone-900 dark:text-stone-50">StyleAI</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-stone-400 dark:text-neutral-500 hover:opacity-70 transition-opacity cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<main class="max-w-xl mx-auto px-container-margin py-stack-lg">
+<!-- Hero Section -->
+<section class="mb-stack-xl text-center">
+<div class="inline-block px-4 py-1 mb-stack-sm rounded-full bg-surface-container-low border border-outline-variant text-label-md font-label-md uppercase tracking-widest text-primary">
+                The Journey Begins
+            </div>
+<h1 class="font-display-md text-display-md mb-stack-sm text-on-surface">Curation starts with your voice.</h1>
+<p class="font-body-md text-body-md text-secondary max-w-sm mx-auto">Tell us about your aesthetic preferences, favorite textures, and the way you want to feel in your clothes.</p>
+</section>
+<!-- Input Area Section -->
+<section class="mb-stack-lg">
+<div class="relative bg-white border border-outline-variant rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.03)] p-stack-md transition-all focus-within:shadow-[0_15px_40px_rgba(0,0,0,0.06)] focus-within:border-primary">
+<label class="block font-label-md text-label-md text-secondary mb-stack-sm uppercase tracking-widest" for="style-desc">Describe your style...</label>
+<textarea class="w-full bg-transparent border-none focus:ring-0 font-headline-md text-headline-md placeholder:text-surface-container-highest resize-none" id="style-desc" placeholder="I love high-waisted tailored trousers in neutral linen, paired with silk camisoles and oversized cashmere sweaters for a sophisticated but relaxed Parisian feel..." rows="5"></textarea>
+<div class="flex items-center justify-between mt-stack-sm pt-stack-sm border-t border-surface-container">
+<button class="flex items-center gap-2 text-primary hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+<span class="font-label-lg text-label-lg">Speak Description</span>
+</button>
+<span class="text-label-md font-label-md text-surface-variant">240 characters</span>
+</div>
+</div>
+</section>
+<!-- AI Profile Extraction Chips -->
+<section class="mb-stack-xl">
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="auto_awesome" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="font-label-lg text-label-lg uppercase tracking-wider text-secondary">AI Profile Extraction</h3>
+</div>
+<div class="flex flex-wrap gap-gutter">
+<!-- Gender Chip -->
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full group hover:border-primary transition-colors cursor-default">
+<span class="font-label-md text-label-md text-secondary">Gender:</span>
+<span class="font-label-md text-label-md text-on-surface">Female</span>
+</div>
+<!-- Style Chip -->
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full group hover:border-primary transition-colors cursor-default">
+<span class="font-label-md text-label-md text-secondary">Style:</span>
+<span class="font-label-md text-label-md text-on-surface">Minimalist</span>
+</div>
+<!-- Colors Chip -->
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full group hover:border-primary transition-colors cursor-default">
+<span class="font-label-md text-label-md text-secondary">Colors:</span>
+<span class="font-label-md text-label-md text-on-surface">Earth Tones</span>
+</div>
+<!-- Texture Chip (Bonus) -->
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full group hover:border-primary transition-colors cursor-default">
+<span class="font-label-md text-label-md text-secondary">Vibe:</span>
+<span class="font-label-md text-label-md text-on-surface">Sophisticated</span>
+</div>
+</div>
+</section>
+<!-- Main Action Section -->
+<section class="mb-stack-xl">
+<button class="w-full h-14 bg-primary text-on-primary rounded-xl font-label-lg text-label-lg uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3">
+                Build My Profile
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</section>
+<!-- Inspiration Grid (Editorial Aesthetic) -->
+<section class="mt-stack-xl">
+<h2 class="font-headline-lg text-headline-lg mb-stack-lg text-center">Moodboard Inspiration</h2>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="aspect-[3/4] overflow-hidden rounded-xl shadow-sm">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="A sophisticated woman wearing a cream-colored minimalist linen suit standing against a soft-textured beige wall. The lighting is bright and airy, typical of a high-end fashion editorial. The scene is calm and focused on the clean lines and tactile quality of the fabric, perfectly matching the primary and tertiary tones of a luxury minimalist brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDJWIuQd5RU1BPkik_yW-FNv7EyCGBJ5XdDhrsGsKVTt3eOIYcHqsb4mKzq96vDOl0fQiE0Gi2adMgDxOpMttGS5BKtciecw2aBuwq5fWVYEuJa6h4GAif3vS2AwwjByWUFRKZGBA6GQFsTRU3O_wrkctKFKuAI6m68oazJ2swqaj3Ss4NtqZ8YhICq3_M3F0kRlWFmFaXZzGPbcednEO-_vghM7_8Y3PPq3edxV6hQ9gy9z8J00IlykF_65yK6Kfm9EmOXC6xa5Ui"/>
+</div>
+<div class="grid grid-rows-2 gap-gutter">
+<div class="aspect-square overflow-hidden rounded-xl shadow-sm">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Close up of a collection of high-quality fabric swatches including silk, cashmere, and fine wool in a palette of earth tones like tan, sage, and deep charcoal. The image emphasizes the tactile textures and premium quality in a minimalist, bright setting. The mood is serene and curated, evoking the feeling of a luxury boutique design studio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9XEU27oHh8AW8cq-TpLINSgFs450cAgCmdJ5tW8oWOQy8pEt4CgaI8LGiG60BqPw7DUqLcSEnHr0WJW_-D2GviaWk5DdaElSm91GAH3iNV0wDwPEaKz0zKNWtBKNqr2U0RnldUOuWwWT5hOpz9MN9Z9zOwjQRNiR_1geiahIp_JZObE45RpePBoRyW5P2za-79DNLw7FP8jRyLX6VepIjEqRF5daZl-X0jgRQ1RmypuK6tOfL3-7Rq0TPDYy-OcKXNP_H80AppbVZ"/>
+</div>
+<div class="aspect-square overflow-hidden rounded-xl shadow-sm">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="A minimalist still life of a single gold watch and a bottle of high-end perfume on a marble surface. The lighting is soft and diffused, creating a luxurious and clean aesthetic. The composition uses plenty of negative space to convey exclusivity and aesthetic restraint, aligning with the brand's high-fashion digital-first philosophy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvHwiiLEaaLlNEq9-Z9ywGznsUKCHIbZFdor1GfXDblAg4-60QtzOytCv8fLxpZKIEmmLFRvmb7jwsFe6FduDgm6rDEnWuqn0WMd6NZKtiKy4ZrNZI0HU1kEJ5wdAMgLU-6F77Pm5rrbj_RsEpO5cO8Qmf_3OcMrRU49ai9Z5PW-q53t6ucBxKjG671Jpk6mZZnxtJJJJbodchBXT1XX_p85lQf4LHfBl6X8COmCles2aJzJgx3RZUlJY36JrvFmdan5TNZo2qfKEm"/>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 px-8 flex justify-around items-center pb-safe bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md fixed bottom-0 w-full z-50 border-t border-stone-100 dark:border-neutral-800 shadow-[0_-10px_30px_rgba(0,0,0,0.04)]">
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-neutral-500 hover:text-stone-900 dark:hover:text-stone-100 active:scale-95 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="checkroom">checkroom</span>
+<span class="font-serif text-[10px] uppercase tracking-widest mt-1">Closet</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-neutral-500 hover:text-stone-900 dark:hover:text-stone-100 active:scale-95 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-serif text-[10px] uppercase tracking-widest mt-1">Generate</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-neutral-500 hover:text-stone-900 dark:hover:text-stone-100 active:scale-95 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+<span class="font-serif text-[10px] uppercase tracking-widest mt-1">Scan</span>
+</div>
+<div class="flex flex-col items-center justify-center text-amber-600 dark:text-amber-500 font-bold active:scale-95 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-serif text-[10px] uppercase tracking-widest mt-1">Profile</span>
+</div>
+</nav>
+<!-- Spacer for Bottom Nav -->
+<div class="h-24"></div>
+</body></html>
