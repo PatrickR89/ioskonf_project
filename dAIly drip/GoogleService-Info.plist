@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyCb0oB9S_5mcA1zUSIXMlF3lDH47B6eiAY</string>
+	<string>AIzaSyD2-H6-jS6PlTCibQqUw6-eWBbPUtPopdI</string>
 	<key>GCM_SENDER_ID</key>
-	<string>985005547990</string>
+	<string>1076765502027</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>io.iosKonf.dAIly-drip</string>
 	<key>PROJECT_ID</key>
-	<string>dailydrip-1ff2b</string>
+	<string>daily-drip-f8fe5</string>
 	<key>STORAGE_BUCKET</key>
-	<string>dailydrip-1ff2b.firebasestorage.app</string>
+	<string>daily-drip-f8fe5.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:985005547990:ios:c72232513f2fda83d2c477</string>
+	<string>1:1076765502027:ios:f1589b6b9501aef1c33bce</string>
 </dict>
 </plist>
