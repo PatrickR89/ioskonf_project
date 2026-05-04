@@ -3,7 +3,7 @@ import SwiftUI
 struct DAIlyDripTopBar: View {
     enum Leading { case menu, close, none }
 
-    var leading: Leading = .menu
+    var leading: Leading = .none
     var leadingAction: () -> Void = {}
     var trailingAction: () -> Void = {}
     var leadingTinted: Bool = false
@@ -11,18 +11,9 @@ struct DAIlyDripTopBar: View {
 
     var body: some View {
         HStack {
-            leadingButton
-                .frame(width: 32, height: 32, alignment: .leading)
             Spacer()
             DAIlyDripWordmark()
             Spacer()
-            Button(action: trailingAction) {
-                Label("Account", systemImage: "person.crop.circle")
-                    .labelStyle(.iconOnly)
-                    .font(.system(size: 24, weight: .regular))
-                    .foregroundStyle(trailingTinted ? AppColor.primary : AppColor.outline)
-            }
-            .frame(width: 32, height: 32, alignment: .trailing)
         }
         .padding(.horizontal, Spacing.containerMargin)
         .frame(height: 56)
